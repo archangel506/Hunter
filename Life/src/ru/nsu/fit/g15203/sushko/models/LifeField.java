@@ -1,10 +1,13 @@
 package ru.nsu.fit.g15203.sushko.models;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class LifeField {
-    public static final double FST_IMPACT = 1.9;
+    public static final double FST_IMPACT = 1.0;
     public static final double SND_IMPACT = 0.3;
-    public static final double LIVE_BEGIN = 2.3;
-    public static final double LIVE_END = 5.0;
+    public static final double LIVE_BEGIN = 2.0;
+    public static final double LIVE_END = 3.3;
     public static final double BIRTH_BEGIN = 2.3;
     public static final double BIRTH_END = 2.9;
 
@@ -24,52 +27,49 @@ public class LifeField {
         for (int i = 0; i < impact.length; ++i) {
             boolean longLine = (i % 2 == 0);
             for (int j = 0; j < (longLine ? impact[i].length : impact[i].length - 1); ++j) {
-                nextState[i][j] = FST_IMPACT * countFirstNeighbor(i, j, longLine)
-                        + SND_IMPACT * countTwelveNeighbor(i, j, longLine);
-                if(liveState[i][j]){
-                    if(!continueLife(i,j)){
-                        liveState[i][j] = false;
-                    }
-                } else{
-                     if(readyBirth(i,j)){
-                         liveState[i][j] = true;
-                     }
-                }
+                nextState[i][j]
+                        = FST_IMPACT * countFirstNeighbor(i, j, longLine) + SND_IMPACT * countTwelveNeighbor(i, j, longLine);
             }
         }
         double[][] temp = nextState;
         nextState = impact;
         impact = temp;
+
+        for (int i = 0; i < impact.length; ++i) {
+            boolean longLine = (i % 2 == 0);
+            for (int j = 0; j < (longLine ? impact[i].length : impact[i].length - 1); ++j) {
+                if (liveState[i][j]) {
+                    if (!continueLife(i, j)) {
+                        liveState[i][j] = false;
+                    }
+                } else {
+                    if (readyBirth(i, j)) {
+                        liveState[i][j] = true;
+                    }
+                }
+            }
+        }
     }
 
     public boolean isLive(int x, int y) {
         return liveState[x][y];
     }
 
-    private boolean continueLife(int x, int y){
-        return nextState[x][y] >= LifeField.LIVE_BEGIN&& nextState[x][y] <= LifeField.LIVE_END;
+    private boolean continueLife(int x, int y) {
+        return impact[x][y] >= LifeField.LIVE_BEGIN && impact[x][y] <= LifeField.LIVE_END;
     }
 
-    private boolean readyBirth(int x, int y){
-        return nextState[x][y] >= LifeField.BIRTH_BEGIN&& nextState[x][y] <= LifeField.BIRTH_END;
+    private boolean readyBirth(int x, int y) {
+        return impact[x][y] >= LifeField.BIRTH_BEGIN && impact[x][y] <= LifeField.BIRTH_END;
     }
 
     public void resetField() {
         for (int i = 0; i < impact.length; ++i) {
             for (int j = 0; j < impact[i].length; ++j) {
                 impact[i][j] = 0;
+                liveState[i][j] = false;
             }
         }
-        impact[3][2] = 2.3;
-        impact[3][3] = 4;
-        impact[3][4] = 2.3;
-        impact[4][3] = 3.3;
-        impact[4][4] = 3.3;
-        liveState[3][2] = true;
-        liveState[3][3] = true;
-        liveState[3][4] = true;
-        liveState[4][3] = true;
-        liveState[4][4] = true;
     }
 
     public int getWidth() {
@@ -80,85 +80,120 @@ public class LifeField {
         return impact.length;
     }
 
-    public void setState(int x, int y, double state) {
-        impact[x][y] = state;
-        liveState[x][y] = true;
+    public void setState(int x, int y, boolean state) {
+        liveState[x][y] = state;
+        boolean longLine = (x % 2 == 0);
+
+        ArrayList<Point> list = getFirstNeighbor(x, y, longLine);
+        for (Point point : list) {
+            boolean temp = point.x % 2 == 0;
+            impact[point.x][point.y]
+                    = FST_IMPACT * countFirstNeighbor(point.x, point.y, temp)
+                    + SND_IMPACT * countTwelveNeighbor(point.x, point.y, temp);
+        }
+        ArrayList<Point> list2 = getTwelveNeighbor(x, y, longLine);
+        for (Point point : list2) {
+            boolean temp = point.x % 2 == 0;
+            impact[point.x][point.y]
+                    = FST_IMPACT * countFirstNeighbor(point.x, point.y, temp)
+                    + SND_IMPACT * countTwelveNeighbor(point.x, point.y, temp);
+        }
+
     }
 
-    public double getState(int x, int y) {
+    public boolean getLifeState(int x, int y) {
+        return liveState[x][y];
+    }
+
+    public double getImpactState(int x, int y) {
         return impact[x][y];
     }
 
     private int countFirstNeighbor(int x, int y, boolean longLine) {
         int fst_count = 0;
-        boolean leftTopNeighbor = (longLine ? y > 0 : true) && x > 0;
-        boolean rightTopNeighbor = (longLine ? true : y < impact[0].length - 1) && x > 0;
-        boolean leftDownNeighbor = (longLine ? y > 0 : true) && x < impact.length - 1;
-        boolean rightDownNeighbor = (longLine ? true : y < impact[0].length - 1)
-                && x < impact.length - 1;
-        boolean leftNeighbor = y > 0;
-        boolean rightNeighbor = y < impact.length - 1;
 
-
-        if (leftNeighbor && isLive(x, y - 1)) {
-            ++fst_count;
-        }
-        if (rightNeighbor && isLive(x, y + 1)) {
-            ++fst_count;
-        }
-
-        if (leftTopNeighbor && isLive(x - 1, longLine ? y - 1 : y)) {
-            ++fst_count;
-        }
-
-        if (rightTopNeighbor && isLive(x - 1, longLine ? y : y + 1)) {
-            ++fst_count;
-        }
-
-        if (leftDownNeighbor && isLive(x + 1, longLine ? y - 1 : y)) {
-            ++fst_count;
-        }
-
-        if (rightDownNeighbor && isLive(x + 1, longLine ? y : y + 1)) {
-            ++fst_count;
+        ArrayList<Point> list = getFirstNeighbor(x, y, longLine);
+        for (Point point : list) {
+            if (isLive(point.x, point.y)) {
+                ++fst_count;
+            }
         }
 
         return fst_count;
     }
 
-    private int countTwelveNeighbor(int x, int y, boolean longLine) {
-        boolean leftTopNeighbor = (longLine ? y > 1 : y > 0) && x > 0;
-        boolean leftDownNeighbor = (longLine ? y > 1 : y > 0) && x < impact.length - 1;
-        boolean rightTopNeighbor = (longLine ? y < impact[0].length - 1 : y < impact[0].length - 2)
-                && x > 0;
-        boolean rightDownNeighbor = (longLine ? y < impact[0].length - 1 : y < impact[0].length - 2)
+    private ArrayList<Point> getFirstNeighbor(int x, int y, boolean longLine) {
+        ArrayList<Point> arrayList = new ArrayList<>();
+        boolean leftNeighbor = y > 0;
+        if (leftNeighbor) {
+            arrayList.add(new Point(x, y - 1));
+        }
+        boolean rightNeighbor = (longLine ? y < impact[0].length - 1 : y < impact[0].length - 2);
+        if (rightNeighbor) {
+            arrayList.add(new Point(x, y + 1));
+        }
+        boolean leftTopNeighbor = (longLine ? y > 0 : true) && x > 0;
+        if (leftTopNeighbor) {
+            arrayList.add(new Point(x - 1, longLine ? y - 1 : y));
+        }
+        boolean rightTopNeighbor = (longLine ? true : y < impact[0].length - 1) && x > 0;
+        if (rightTopNeighbor) {
+            arrayList.add(new Point(x - 1, longLine ? y : y + 1));
+        }
+        boolean leftDownNeighbor = (longLine ? y > 0 : true) && x < impact.length - 1;
+        if (leftDownNeighbor) {
+            arrayList.add(new Point(x + 1, longLine ? y - 1 : y));
+        }
+        boolean rightDownNeighbor = (longLine ? true : y < impact[0].length - 1)
                 && x < impact.length - 1;
-        boolean centerTopNeighbor = x > 1;
-        boolean centerDownNeighbor = x < impact.length - 2;
+        if (rightDownNeighbor) {
+            arrayList.add(new Point(x + 1, longLine ? y : y + 1));
+        }
 
+        return arrayList;
+    }
+
+    private int countTwelveNeighbor(int x, int y, boolean longLine) {
         int snd_count = 0;
-
-        if (leftTopNeighbor && isLive(x - 1, longLine ? y - 2 : y - 1)) {
-            ++snd_count;
+        ArrayList<Point> list = getTwelveNeighbor(x, y, longLine);
+        for (Point point : list) {
+            if (isLive(point.x, point.y)) {
+                ++snd_count;
+            }
         }
-
-        if (leftDownNeighbor && isLive(x + 1, longLine ? y - 2 : y - 1)) {
-            ++snd_count;
-        }
-        if (rightTopNeighbor && isLive(x - 1, longLine ? y + 1 : y + 2)) {
-            ++snd_count;
-        }
-        if (rightDownNeighbor && isLive(x + 1, longLine ? y + 1 : y + 2)) {
-            ++snd_count;
-        }
-        if (centerTopNeighbor && isLive(x - 2, y)) {
-            ++snd_count;
-        }
-        if (centerDownNeighbor && isLive(x + 2, y)) {
-            ++snd_count;
-        }
-
 
         return snd_count;
+    }
+
+    private ArrayList<Point> getTwelveNeighbor(int x, int y, boolean longLine) {
+        ArrayList<Point> arrayList = new ArrayList<>();
+        boolean leftTopNeighbor = (longLine ? y > 1 : y > 0) && x > 0;
+        if (leftTopNeighbor) {
+            arrayList.add(new Point(x - 1, longLine ? y - 2 : y - 1));
+        }
+        boolean leftDownNeighbor = (longLine ? y > 1 : y > 0) && x < impact.length - 1;
+        if (leftDownNeighbor) {
+            arrayList.add(new Point(x + 1, longLine ? y - 2 : y - 1));
+        }
+        boolean rightTopNeighbor = (longLine ? y < impact[0].length - 1 : y < impact[0].length - 2)
+                && x > 0;
+        if (rightTopNeighbor) {
+            arrayList.add(new Point(x - 1, longLine ? y + 1 : y + 2));
+        }
+        boolean rightDownNeighbor = (longLine ? y < impact[0].length - 1 : y < impact[0].length - 2)
+                && x < impact.length - 1;
+        if (rightDownNeighbor) {
+            arrayList.add(new Point(x + 1, longLine ? y + 1 : y + 2));
+
+        }
+        boolean centerTopNeighbor = x > 1;
+        if (centerTopNeighbor) {
+            arrayList.add(new Point(x - 2, y));
+        }
+        boolean centerDownNeighbor = x < impact.length - 2;
+        if (centerDownNeighbor) {
+            arrayList.add(new Point(x + 2, y));
+        }
+        return arrayList;
     }
 }

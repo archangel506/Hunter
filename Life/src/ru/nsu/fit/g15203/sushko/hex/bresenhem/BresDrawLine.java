@@ -38,6 +38,7 @@ public class BresDrawLine implements DrawerLine {
         err = el / 2;
         bufferedImage.setRGB(x, y, Color.RED.getRGB());
 
+
         for (int t = 0; t < el; t++)
         {
             err -= es;
@@ -50,15 +51,7 @@ public class BresDrawLine implements DrawerLine {
                 y += pdy;
             }
 
-            try {
-
-                bufferedImage.setRGB(x, y, Color.RED.getRGB());
-            }catch (ArrayIndexOutOfBoundsException e){
-                e.printStackTrace();
-            }
-
-
-
+            bufferedImage.setRGB(x, y, Color.RED.getRGB());
         }
     }
 

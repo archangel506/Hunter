@@ -11,8 +11,7 @@ public class FillerSpan implements FillerHex {
     @Override
     public void fillHex(int x, int y, int color, BufferedImage bufferedImage) {
         int currentColor = bufferedImage.getRGB(x,y);
-        if(currentColor == HexField.COLOR_LINE || currentColor == color
-                || !inHex(x,y, bufferedImage)){
+        if(currentColor == HexField.COLOR_LINE){
             return;
         }
         Stack<Span> stack = new Stack<>();
@@ -50,40 +49,6 @@ public class FillerSpan implements FillerHex {
 
             }
         }
-    }
-
-    private boolean inHex(int x, int y, BufferedImage bufferedImage){
-        boolean haveLineLeft = false;
-        boolean haveLineRight = false;
-        boolean haveLineTop = false;
-        boolean haveLineDown = false;
-        for(int left = x; left >= 0;  --left){
-            if(bufferedImage.getRGB(left, y) == HexField.COLOR_LINE){
-                haveLineLeft = true;
-                break;
-            }
-        }
-        for(int right = x; right < bufferedImage.getWidth();  ++right){
-            if(bufferedImage.getRGB(right, y) == HexField.COLOR_LINE){
-                haveLineRight = true;
-                break;
-            }
-        }
-        for(int top = y; top >= 0;  --top){
-            if(bufferedImage.getRGB(x, top) == HexField.COLOR_LINE){
-                haveLineTop = true;
-                break;
-            }
-        }
-        for(int down = y; down < bufferedImage.getHeight();  ++down){
-            if(bufferedImage.getRGB(x, down) == HexField.COLOR_LINE){
-                haveLineDown = true;
-                break;
-            }
-        }
-
-        return haveLineDown && haveLineTop && haveLineLeft && haveLineRight;
-
     }
 
     private Span createSpan(int x, int line, BufferedImage bufferedImage){

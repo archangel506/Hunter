@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class SimpleGUI extends JFrame{
-    private static final String pathRes = "FIT_15203_Sushko_Denis_Life_Data/icons/";
+    private static final String pathRes = "src/ru/nsu/fit/g15203/sushko/res/icons/";
     private static final String nextIcon = "next.gif";
     private static final String saveIcon = "save.gif";
     private static final String newIcon = "new.gif";
@@ -16,6 +16,7 @@ public class SimpleGUI extends JFrame{
     private static final String playIcon = "play.gif";
     private static final String parametersIcon = "parameters.gif";
     private static final String aboutDialogIcon = "aboutDialog.jpg";
+    private static final String impactIcon = "impact.png";
 
     private static final int MINIMUM_WIDTH = 800;
     private static final int MINIMUM_HEIGHT = 600;
@@ -70,6 +71,12 @@ public class SimpleGUI extends JFrame{
         param.setToolTipText("Parameters");
         toolBar.add(param);
 
+        JButton impact = new JButton(new ImageIcon(pathRes + impactIcon));
+        param.setToolTipText("Show impact");
+        impact.addActionListener(e -> figurePanel.showImpact());
+        toolBar.add(impact);
+
+
         toolBar.addSeparator();
 
         JButton about = new JButton(new ImageIcon(pathRes + aboutIcon));
@@ -102,6 +109,9 @@ public class SimpleGUI extends JFrame{
         jMenuGame.add(itemReset);
         JMenuItem itemParameters = new JMenuItem("Parameters");
         jMenuGame.add(itemParameters);
+        JMenuItem itemImpact = new JMenuItem("Show impact");
+        itemImpact.addActionListener(e -> figurePanel.showImpact());
+        jMenuGame.add(itemImpact);
         menuBar.add(jMenuGame);
 
         JMenu jAbout = new JMenu("About");
@@ -110,7 +120,7 @@ public class SimpleGUI extends JFrame{
         jAbout.add(itemAbout);
         menuBar.add(jAbout);
 
-        //setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
+//      setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
         setPreferredSize(new Dimension(MINIMUM_WIDTH, 800));
         JScrollPane pane = new JScrollPane(figurePanel);
         add(pane);

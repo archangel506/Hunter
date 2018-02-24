@@ -5,38 +5,26 @@ import ru.nsu.fit.g15203.sushko.hex.bresenhem.BresDrawLine;
 import ru.nsu.fit.g15203.sushko.hex.span.FillerSpan;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class FigurePanel extends JPanel{
-    private static final int widthCount = 35;
-    private static final int heightCount = 35;
-    private static final int radiusFigure = 20;
+    private static final int widthCount = 7;
+    private static final int heightCount = 8;
+    private static final int radiusFigure = 25;
 
     private boolean isPlay = false;
 
-
-    private Graphics graphics;
-    private BufferedImage bufferedImage;
     private Field field;
 
     private Timer timer = new Timer();
     private TimerTask timerTask = new MyTask();
 
     public FigurePanel() {
-        int widthField = (int)((double)widthCount  * (double)radiusFigure * 3);
-        int heightField = (int)((double) heightCount * (double) radiusFigure * Math.sqrt(3));
-        bufferedImage = new BufferedImage(widthField, heightField, BufferedImage.TYPE_INT_ARGB);
-        this.field = new HexField(new BresDrawLine(), new FillerSpan(), radiusFigure, bufferedImage,
-                widthCount, heightCount);//некультурно, но быстро, по хорошему нужно через сеттер
-
-        graphics = bufferedImage.createGraphics();
-        graphics.setColor(Color.GRAY);
-        JLabel label = new JLabel(new ImageIcon(bufferedImage));
+        this.field = new HexField(new BresDrawLine(), new FillerSpan(), radiusFigure, widthCount, heightCount);
+        JLabel label = new JLabel(new ImageIcon(field.getBufferedImage()));
 
         MyMouseListener myMouseListener = new MyMouseListener();
         label.addMouseListener(myMouseListener);
@@ -77,6 +65,11 @@ public class FigurePanel extends JPanel{
         timer.schedule(timerTask, 0, 500);
     }
 
+    public void showImpact(){
+        field.showImpact();
+        repaintField();
+    }
+
     private void stopGame(){
         timer.cancel();
         timer.purge();
@@ -88,12 +81,18 @@ public class FigurePanel extends JPanel{
 
     private class MyMouseListener extends MouseAdapter {
         public void mouseClicked(MouseEvent e) {
+            if(isPlay || e.getX() < 0 || e.getY() < 0){
+                return;
+            }
             field.elemChoise(e.getX(), e.getY());
             repaint();
         }
 
         @Override
         public void mouseDragged(MouseEvent e){
+            if(isPlay || e.getX() < 0 || e.getY() < 0){
+                return;
+            }
             field.elemChoise(e.getX(), e.getY());
             repaint();
         }
