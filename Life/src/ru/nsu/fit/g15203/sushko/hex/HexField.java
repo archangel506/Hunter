@@ -1,14 +1,13 @@
 package ru.nsu.fit.g15203.sushko.hex;
 
-import ru.nsu.fit.g15203.sushko.field.Field;
 import ru.nsu.fit.g15203.sushko.models.LifeField;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
-public class HexField implements Field {
-    public static final int SHIFT_FIELD = 5;
+public class HexField{
     public static final int COLOR_DEAD = Color.BLUE.getRGB();
     public static final int COLOR_LIFE = Color.BLACK.getRGB();
     public static final int COLOR_LINE = Color.RED.getRGB();
@@ -20,9 +19,13 @@ public class HexField implements Field {
     private LifeField lifeField;
     private int[][] widthCenterHex;
     private int[][] heightCenterHex;
-    private int widthLine = 3;
+    private int widthLine = 7;
     private boolean showImpact = false;
     private boolean xorEnable = true;
+    private Point lastIndex = null;
+    private int enterRadius;
+    private int shiftFieldX;
+    private int shiftFieldY;
 
     private int radius;
     private int shiftX;
@@ -32,40 +35,11 @@ public class HexField implements Field {
         this.drawerLine = drawerLine;
         this.fillerHex = fillerHex;
 
-        shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
-        while (shiftX != (shiftX / 2) * 2) {
-            ++radius;
-            shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
-        }
-        this.radius = radius;
         lifeField = new LifeField(height, width);
-        widthCenterHex = new int[height][width];
-        heightCenterHex = new int[height][width];
-        shiftY = (int) Math.ceil(3 * radius / 2);
-
-        int startCenterX = (int) Math.ceil(Math.sqrt(3) / 2 * radius) + SHIFT_FIELD;
-        int centerY = radius;
-        for (int i = 0; i < lifeField.getHeight(); ++i) {
-            boolean longLine = (i % 2 == 0);
-            int centerX = (longLine) ? startCenterX : startCenterX + (int) ((double) shiftX / 2);
-            for (int j = 0; j < (longLine ? lifeField.getWidth() : lifeField.getWidth() - 1); ++j) {
-                widthCenterHex[i][j] = centerX;
-                heightCenterHex[i][j] = centerY;
-                centerX += shiftX;
-            }
-            centerY += shiftY;
-        }
-        int coordLastCenterY = (height % 2 == 0) ? lifeField.getWidth() - 2 : lifeField.getWidth() - 1;
-        int widthField =
-                widthCenterHex[lifeField.getHeight() - 1][coordLastCenterY]
-                        + (int) Math.ceil(Math.sqrt(3) * radius / 2) + widthLine
-                        + ((height % 2 == 0) ? shiftX / 2 : 0);
-        int heightField = heightCenterHex[lifeField.getHeight() - 1][coordLastCenterY]
-                + radius + widthLine;
-        this.bufferedImage = new BufferedImage(widthField, heightField, BufferedImage.TYPE_INT_ARGB);
+        setRadiusHex(radius);
+        reCalculateField();
     }
 
-    @Override
     public void drawField() {
 
         for (int i = 0; i < lifeField.getHeight(); ++i) {
@@ -78,46 +52,31 @@ public class HexField implements Field {
         }
     }
 
+//    public void fillElement(int x, int y, int color) {
+//        if (x >= bufferedImage.getWidth() || bufferedImage.getHeight() <= y
+//                || x < SHIFT_FIELD || y < 0) {
+//            return;
+//        }
+//        fillerHex.fillHex(x, y, color, bufferedImage);
+//    }
 
-    @Override
-    public void fillElement(int x, int y, int color) {
-        if (x >= bufferedImage.getWidth() || bufferedImage.getHeight() <= y
-                || x < SHIFT_FIELD || y < 0) {
-            return;
-        }
-        fillerHex.fillHex(x, y, color, bufferedImage);
-    }
-
-    @Override
     public void resetField() {
         lifeField.resetField();
     }
 
-    @Override
-    public void openField() {
-
+    public void offMove(){
+        lastIndex = null;
     }
 
-    @Override
-    public void saveField() {
-
-    }
-
-    @Override
-    public void setParameters() {
-
-    }
-
-    @Override
-    public void elemChoise(int widhtPixel, int heightPixel) {
-
+    public void elemChoise(int widhtPixel, int heightPixel, boolean longPress) {
         if (bufferedImage.getWidth() <= widhtPixel || bufferedImage.getHeight() <= heightPixel
                 || !inHex(widhtPixel, heightPixel)) {
+            offMove();
             return;
         }
 
-        int guessWidth = (widhtPixel - SHIFT_FIELD) / shiftX;
-        int guessHeight = heightPixel / shiftY;
+        int guessWidth = (widhtPixel - shiftFieldX) / shiftX;
+        int guessHeight = (heightPixel - shiftFieldY) / shiftY;
 
         boolean longLine = (guessHeight % 2 == 0);
 
@@ -194,7 +153,12 @@ public class HexField implements Field {
         }
         boolean isLifeElem;
         if(xorEnable){
-            isLifeElem = !lifeField.getLifeState(candidatHeight, candidatWidth);
+            if(lastIndex == null || lastIndex.x != candidatHeight || lastIndex.y != candidatWidth){
+                lastIndex = new Point(candidatHeight, candidatWidth);
+                isLifeElem = !lifeField.getLifeState(candidatHeight, candidatWidth);
+            } else{
+                return;
+            }
         } else {
             isLifeElem = true;
         }
@@ -202,22 +166,100 @@ public class HexField implements Field {
         drawField();
     }
 
-    @Override
     public void nextStep() {
         lifeField.nextStep();
     }
 
-    @Override
     public void showImpact() {
         showImpact = !showImpact;
     }
 
-    @Override
     public BufferedImage getBufferedImage() {
         return bufferedImage;
     }
 
+    public int getWidthCount(){
+        return lifeField.getWidth();
+    }
+
+    public int getHeightCount(){
+        return lifeField.getHeight();
+    }
+
+    public void setSizeField(int witdhCount, int heightCount){
+        lifeField.resizeField(witdhCount, heightCount);
+    }
+
+    public void setRadiusHex(int radius){
+        enterRadius = radius;
+        shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
+        shiftY = (int) Math.ceil(3 * radius / 2);
+
+        while (shiftX != (shiftX / 2) * 2) {
+            ++radius;
+            shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
+        }
+        this.radius = radius;
+    }
+
+    public void setWidthLine(int widthLine){
+        this.widthLine = widthLine;
+    }
+
+
+
+    public int getWidthLine(){
+        return widthLine;
+    }
+
+    public int getRadiusHex(){
+        return enterRadius;
+    }
+
+    public ArrayList<Point> getLifeHex(){
+        return lifeField.getLifeList();
+    }
+
+    public void setLifeHex(int x, int y){
+        lifeField.setState(x, y, true);
+    }
+
+    public void reCalculateField(){
+
+
+        widthCenterHex = new int[lifeField.getHeight()][lifeField.getWidth()];
+        heightCenterHex = new int[lifeField.getHeight()][lifeField.getWidth()];
+
+        shiftFieldX = widthLine / 2;
+        shiftFieldY = widthLine / 2;
+
+        int startCenterX = (int) Math.ceil(Math.sqrt(3) / 2 * radius) + shiftFieldX;
+        int centerY = radius + shiftFieldY;
+        for (int i = 0; i < lifeField.getHeight(); ++i) {
+            boolean longLine = (i % 2 == 0);
+            int centerX = (longLine) ? startCenterX : startCenterX + (int) ((double) shiftX / 2);
+            for (int j = 0; j < (longLine ? lifeField.getWidth() : lifeField.getWidth() - 1); ++j) {
+                widthCenterHex[i][j] = centerX;
+                heightCenterHex[i][j] = centerY;
+                centerX += shiftX;
+            }
+            centerY += shiftY;
+        }
+        int coordLastCenterY = (lifeField.getHeight() % 2 == 0) ? lifeField.getWidth() - 2 : lifeField.getWidth() - 1;
+        int widthField =
+                widthCenterHex[lifeField.getHeight() - 1][coordLastCenterY]
+                        + (int) Math.ceil(Math.sqrt(3) * radius / 2) + widthLine
+                        + ((lifeField.getHeight() % 2 == 0) ? shiftX / 2 : 0);
+        int heightField = heightCenterHex[lifeField.getHeight() - 1][coordLastCenterY]
+                + radius + widthLine;
+        this.bufferedImage = new BufferedImage(widthField, heightField, BufferedImage.TYPE_INT_ARGB);
+
+
+    }
     private boolean inHex(int x, int y) {
+        if(bufferedImage.getRGB(x, y) == HexField.COLOR_LINE){
+            return false;
+        }
         boolean haveLineLeft = false;
         boolean haveLineRight = false;
         boolean haveLineTop = false;
@@ -318,7 +360,8 @@ public class HexField implements Field {
         }
 
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
-        bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getLifeState(x, y)), widthCenterHex[x][y] - 3,
+        bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getImpactState(x, y)), widthCenterHex[x][y] - 3,
                 heightCenterHex[x][y] + 3);
     }
+
 }

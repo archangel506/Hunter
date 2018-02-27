@@ -43,10 +43,12 @@ public class SimpleGUI extends JFrame{
         toolBar.add(newB);
 
         JButton open = new JButton(new ImageIcon(pathRes + openIcon));
+        open.addActionListener(e -> showDialogLoadFile());
         open.setToolTipText("Open");
         toolBar.add(open);
 
         JButton save = new JButton(new ImageIcon(pathRes + saveIcon));
+        save.addActionListener(e -> showDialogSaveFile());
         save.setToolTipText("Save");
         toolBar.add(save);
 
@@ -92,8 +94,10 @@ public class SimpleGUI extends JFrame{
         JMenuItem itemNew = new JMenuItem("New");
         jMenuFile.add(itemNew);
         JMenuItem itemOpen = new JMenuItem("Open");
+        itemOpen.addActionListener(e -> showDialogLoadFile());
         jMenuFile.add(itemOpen);
         JMenuItem itemSave = new JMenuItem("Save");
+        itemSave.addActionListener(e -> showDialogSaveFile());
         jMenuFile.add(itemSave);
         menuBar.add(jMenuFile);
 
@@ -130,6 +134,18 @@ public class SimpleGUI extends JFrame{
         setVisible(true);
     }
 
+    private void showDialogSaveFile(){
+        FileDialog fileDialog = new FileDialog(this, "Save", FileDialog.SAVE);
+        fileDialog.show();
+        figurePanel.saveState(fileDialog.getDirectory() + fileDialog.getFile());
+    }
+
+    private void showDialogLoadFile(){
+        FileDialog fileDialog = new FileDialog(this, "Load", FileDialog.LOAD);
+        fileDialog.show();
+        figurePanel.loadState(fileDialog.getDirectory() + fileDialog.getFile());
+    }
+
     private class AboutActionListener implements ActionListener{
         private JFrame frame;
 
@@ -151,6 +167,6 @@ public class SimpleGUI extends JFrame{
 
 
     public static void main(String[] args) {
-        JFrame jFrame = new SimpleGUI("ru/nsu/fit/g15203/sushko/hex");
+        JFrame jFrame = new SimpleGUI("hex");
     }
 }

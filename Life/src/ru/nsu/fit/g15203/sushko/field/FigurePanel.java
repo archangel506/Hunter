@@ -7,24 +7,28 @@ import ru.nsu.fit.g15203.sushko.hex.span.FillerSpan;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class FigurePanel extends JPanel{
     private static final int widthCount = 7;
     private static final int heightCount = 8;
-    private static final int radiusFigure = 25;
+    private static final int radiusFigure = 50;
 
     private boolean isPlay = false;
 
-    private Field field;
+    private HexField field;
 
     private Timer timer = new Timer();
     private TimerTask timerTask = new MyTask();
+    private FileMng fileMng;
+    private JLabel label;
 
     public FigurePanel() {
         this.field = new HexField(new BresDrawLine(), new FillerSpan(), radiusFigure, widthCount, heightCount);
-        JLabel label = new JLabel(new ImageIcon(field.getBufferedImage()));
+        this.fileMng = new FileMng(field);
+        label = new JLabel(new ImageIcon(field.getBufferedImage()));
 
         MyMouseListener myMouseListener = new MyMouseListener();
         label.addMouseListener(myMouseListener);
@@ -78,14 +82,40 @@ public class FigurePanel extends JPanel{
         isPlay = false;
     }
 
+    public void saveState(String file){
+        fileMng.saveState(file);
+    }
+
+    public void loadState(String file){
+        try {
+            fileMng.loadState(file);
+        } catch (ParseFileException e){
+            e.printStackTrace();
+            return;
+        }
+
+        label.setIcon(new ImageIcon(field.getBufferedImage()));
+        label.revalidate();
+
+        add(label);
+        revalidate();
+        repaintField();
+    }
+
 
     private class MyMouseListener extends MouseAdapter {
         public void mouseClicked(MouseEvent e) {
             if(isPlay || e.getX() < 0 || e.getY() < 0){
                 return;
             }
-            field.elemChoise(e.getX(), e.getY());
+            field.elemChoise(e.getX(), e.getY(), false);
             repaint();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+            field.offMove();
         }
 
         @Override
@@ -93,7 +123,7 @@ public class FigurePanel extends JPanel{
             if(isPlay || e.getX() < 0 || e.getY() < 0){
                 return;
             }
-            field.elemChoise(e.getX(), e.getY());
+            field.elemChoise(e.getX(), e.getY(), true);
             repaint();
         }
     }

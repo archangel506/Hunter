@@ -101,6 +101,19 @@ public class LifeField {
 
     }
 
+    public ArrayList<Point> getLifeList(){
+
+        ArrayList<Point> points = new ArrayList<>();
+        for(int i = 0; i < liveState.length; ++i){
+            for(int j = 0; j < liveState[0].length; ++j){
+                if(liveState[i][j]){
+                    points.add(new Point(i,j));
+                }
+            }
+        }
+        return points;
+    }
+
     public boolean getLifeState(int x, int y) {
         return liveState[x][y];
     }
@@ -108,6 +121,29 @@ public class LifeField {
     public double getImpactState(int x, int y) {
         return impact[x][y];
     }
+
+    public void resizeField(int width, int height){
+        double[][] newImpact = new double[height][width];
+        double[][] twelveBuffer = new double[height][width];
+        boolean[][] livemass = new boolean[height][width];
+        for(int i = 0; i < newImpact.length; ++i){
+            for(int j = 0; j < newImpact[0].length; ++j){
+                if(i >= impact.length || j >= impact[0].length){
+                    newImpact[i][j] = 0;
+                    twelveBuffer[i][j] = 0;
+                    livemass[i][j] = false;
+                } else{
+                    newImpact[i][j] = impact[i][j];
+                    twelveBuffer[i][j] = nextState[i][j];
+                    livemass[i][j] = liveState[i][j];
+                }
+            }
+        }
+        impact = newImpact;
+        nextState = twelveBuffer;
+        liveState = livemass;
+    }
+
 
     private int countFirstNeighbor(int x, int y, boolean longLine) {
         int fst_count = 0;
