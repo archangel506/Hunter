@@ -42,9 +42,9 @@ public class FileMng {
             for (int i = 0; i < arrayList.size(); ++i) {
                 Point point = arrayList.get(i);
                 if (i != arrayList.size() - 1) {
-                    writer.write(point.x + " " + point.y + "\n");
+                    writer.write(point.y + " " + point.x + "\n");
                 } else {
-                    writer.write(point.x + " " + point.y);
+                    writer.write(point.y + " " + point.x);
                 }
             }
         } catch (IOException e) {
@@ -70,8 +70,8 @@ public class FileMng {
                 if (width == NEED_LOAD) {
                     Point size = parseTwoSymb(line);
                     if(size != null) {
-                        width = size.x;
                         height = size.y;
+                        width = size.x;
                     }
                 } else {
                     if (widthLine == NEED_LOAD) {
@@ -101,18 +101,18 @@ public class FileMng {
         }
 
         for(Point point: arrayList){
-            if(point.y >= height || point.x >= width){
+            if(point.x >= width || point.y >= height){
                 throw new ParseFileException();
             }
         }
 
 
-
+        field.resetField();
         field.setSizeField(width, height);
         field.setWidthLine(widthLine);
         field.setRadiusHex(radius);
         for(Point point: arrayList){
-            field.setLifeHex(point.x, point.y);
+            field.setLifeHex(point.y, point.x);
         }
         field.reCalculateField();
     }

@@ -4,12 +4,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class LifeField {
-    public static final double FST_IMPACT = 1.0;
-    public static final double SND_IMPACT = 0.3;
-    public static final double LIVE_BEGIN = 2.0;
-    public static final double LIVE_END = 3.3;
-    public static final double BIRTH_BEGIN = 2.3;
-    public static final double BIRTH_END = 2.9;
+    private double FST_IMPACT = 1.0;
+    private double SND_IMPACT = 0.3;
+    private double LIVE_BEGIN = 2.0;
+    private double LIVE_END = 3.3;
+    private double BIRTH_BEGIN = 2.3;
+    private double BIRTH_END = 2.9;
 
 
     private double[][] nextState;
@@ -20,6 +20,7 @@ public class LifeField {
         impact = new double[height][width];
         nextState = new double[height][width];
         liveState = new boolean[height][width];
+
         resetField();
     }
 
@@ -56,11 +57,11 @@ public class LifeField {
     }
 
     private boolean continueLife(int x, int y) {
-        return impact[x][y] >= LifeField.LIVE_BEGIN && impact[x][y] <= LifeField.LIVE_END;
+        return impact[x][y] >= LIVE_BEGIN && impact[x][y] <= LIVE_END;
     }
 
     private boolean readyBirth(int x, int y) {
-        return impact[x][y] >= LifeField.BIRTH_BEGIN && impact[x][y] <= LifeField.BIRTH_END;
+        return impact[x][y] >= BIRTH_BEGIN && impact[x][y] <= BIRTH_END;
     }
 
     public void resetField() {
@@ -114,6 +115,15 @@ public class LifeField {
         return points;
     }
 
+    private void recalculateImpact(){
+        for(int i = 0; i < impact.length; ++i){
+            boolean longline = i % 2 == 0;
+            for(int j = 0; j < (longline ? impact[0].length : impact[0].length - 1); ++j){
+                setState(i, j, liveState[i][j]);
+            }
+        }
+    }
+
     public boolean getLifeState(int x, int y) {
         return liveState[x][y];
     }
@@ -142,6 +152,54 @@ public class LifeField {
         impact = newImpact;
         nextState = twelveBuffer;
         liveState = livemass;
+        recalculateImpact();
+    }
+
+    public double getFstImpact() {
+        return FST_IMPACT;
+    }
+
+    public void setFstImpact(double impact){
+        FST_IMPACT = impact;
+    }
+
+    public double getSndImpact(){
+        return SND_IMPACT;
+    }
+
+    public void setSndImpact(double impact){
+        SND_IMPACT = impact;
+    }
+
+    public double getLiveBegin() {
+        return LIVE_BEGIN;
+    }
+
+    public void setLiveBegin(double live) {
+        LIVE_BEGIN = live;
+    }
+
+    public double getLiveEnd() {
+        return LIVE_END;
+    }
+
+    public void setLiveEnd(double live) {
+        LIVE_END = live;
+    }
+
+    public double getBirthBegin() {
+        return BIRTH_BEGIN;
+    }
+
+    public void setBirthBegin(double birth) {
+        BIRTH_BEGIN = birth;
+    }
+
+    public double getBirthEnd() {
+        return BIRTH_END;
+    }
+    public void setBirthEnd(double birth) {
+       BIRTH_END = birth;
     }
 
 

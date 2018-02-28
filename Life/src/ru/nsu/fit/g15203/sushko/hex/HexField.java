@@ -8,10 +8,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class HexField{
-    public static final int COLOR_DEAD = Color.BLUE.getRGB();
-    public static final int COLOR_LIFE = Color.BLACK.getRGB();
+    public static final int COLOR_DEAD = Color.GRAY.getRGB();
+    public static final int COLOR_LIFE = Color.ORANGE.getRGB();
     public static final int COLOR_LINE = Color.RED.getRGB();
-
 
     private DrawerLine drawerLine;
     private FillerHex fillerHex;
@@ -19,8 +18,10 @@ public class HexField{
     private LifeField lifeField;
     private int[][] widthCenterHex;
     private int[][] heightCenterHex;
+
     private int widthLine = 7;
     private boolean showImpact = false;
+
     private boolean xorEnable = true;
     private Point lastIndex = null;
     private int enterRadius;
@@ -51,14 +52,6 @@ public class HexField{
             }
         }
     }
-
-//    public void fillElement(int x, int y, int color) {
-//        if (x >= bufferedImage.getWidth() || bufferedImage.getHeight() <= y
-//                || x < SHIFT_FIELD || y < 0) {
-//            return;
-//        }
-//        fillerHex.fillHex(x, y, color, bufferedImage);
-//    }
 
     public void resetField() {
         lifeField.resetField();
@@ -193,12 +186,12 @@ public class HexField{
     public void setRadiusHex(int radius){
         enterRadius = radius;
         shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
-        shiftY = (int) Math.ceil(3 * radius / 2);
 
         while (shiftX != (shiftX / 2) * 2) {
             ++radius;
             shiftX = (int) Math.ceil(Math.sqrt(3) * radius);
         }
+        shiftY = (int) Math.ceil(3 * radius / 2);
         this.radius = radius;
     }
 
@@ -225,13 +218,11 @@ public class HexField{
     }
 
     public void reCalculateField(){
-
-
         widthCenterHex = new int[lifeField.getHeight()][lifeField.getWidth()];
         heightCenterHex = new int[lifeField.getHeight()][lifeField.getWidth()];
 
         shiftFieldX = widthLine / 2;
-        shiftFieldY = widthLine / 2;
+        shiftFieldY = widthLine / 2 + 1;
 
         int startCenterX = (int) Math.ceil(Math.sqrt(3) / 2 * radius) + shiftFieldX;
         int centerY = radius + shiftFieldY;
@@ -256,6 +247,70 @@ public class HexField{
 
 
     }
+
+    public boolean isXorEnable() {
+        return xorEnable;
+    }
+
+    public void setXorEnable(boolean flag){
+        xorEnable = flag;
+    }
+
+    public double getFstImpact() {
+        return lifeField.getFstImpact();
+    }
+
+    public void setFstImpact(double impact){
+        lifeField.setFstImpact(impact);
+    }
+
+    public double getSndImpact(){
+        return lifeField.getSndImpact();
+    }
+    public void setSndImpact(double impact){
+        lifeField.setSndImpact(impact);
+    }
+
+    public double getLiveBegin() {
+        return lifeField.getLiveBegin();
+    }
+    public void setLiveBegin(double live) {
+        lifeField.setLiveBegin(live);
+    }
+
+    public double getLiveEnd() {
+        return lifeField.getLiveEnd();
+    }
+    public void setLiveEnd(double live) {
+        lifeField.setLiveEnd(live);
+    }
+
+    public double getBirthBegin() {
+        return lifeField.getBirthBegin();
+    }
+    public void setBirthBegin(double birth) {
+        lifeField.setBirthBegin(birth);
+    }
+
+    public double getBirthEnd() {
+        return lifeField.getBirthEnd();
+    }
+    public void setBirthEnd(double birth) {
+        lifeField.setBirthEnd(birth);
+    }
+
+    public int getRadius() {
+        return enterRadius;
+    }
+
+    public int getWidth(){
+        return lifeField.getWidth();
+    }
+
+    public int getHeight(){
+        return lifeField.getHeight();
+    }
+
     private boolean inHex(int x, int y) {
         if(bufferedImage.getRGB(x, y) == HexField.COLOR_LINE){
             return false;
@@ -362,6 +417,136 @@ public class HexField{
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
         bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getImpactState(x, y)), widthCenterHex[x][y] - 3,
                 heightCenterHex[x][y] + 3);
+    }
+
+    public DataField getActualState(){
+        DataField dataField = new DataField();
+        dataField.setWidth(lifeField.getWidth());
+        dataField.setHeight(lifeField.getHeight());
+        dataField.setWidthLine(widthLine);
+        dataField.setRadius(enterRadius);
+        dataField.setFST_IMPACT(lifeField.getFstImpact());
+        dataField.setSND_IMPACT(lifeField.getSndImpact());
+        dataField.setLIVE_BEGIN(lifeField.getLiveBegin());
+        dataField.setLIVE_END(lifeField.getLiveEnd());
+        dataField.setBIRTH_BEGIN(lifeField.getBirthBegin());
+        dataField.setBIRTH_END(lifeField.getBirthEnd());
+        dataField.setXor(xorEnable);
+        dataField.setLivePoints(lifeField.getLifeList());
+        return dataField;
+    }
+
+    public static class DataField{
+        private int width;
+        private int height;
+        private int widthLine;
+        private int radius;
+        private ArrayList<Point> livePoints;
+        private double FST_IMPACT;
+        private double SND_IMPACT;
+        private double LIVE_BEGIN;
+        private double LIVE_END;
+        private double BIRTH_BEGIN;
+        private double BIRTH_END;
+        private boolean xor;
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public int getWidthLine() {
+            return widthLine;
+        }
+
+        public void setWidthLine(int widthLine) {
+            this.widthLine = widthLine;
+        }
+
+        public int getRadius() {
+            return radius;
+        }
+
+        public void setRadius(int radius) {
+            this.radius = radius;
+        }
+
+        public ArrayList<Point> getLivePoints() {
+            return livePoints;
+        }
+
+        public void setLivePoints(ArrayList<Point> livePoints) {
+            this.livePoints = new ArrayList<>(livePoints);
+        }
+
+        public double getFST_IMPACT() {
+            return FST_IMPACT;
+        }
+
+        public void setFST_IMPACT(double FST_IMPACT) {
+            this.FST_IMPACT = FST_IMPACT;
+        }
+
+        public double getSND_IMPACT() {
+            return SND_IMPACT;
+        }
+
+        public void setSND_IMPACT(double SND_IMPACT) {
+            this.SND_IMPACT = SND_IMPACT;
+        }
+
+        public double getLIVE_BEGIN() {
+            return LIVE_BEGIN;
+        }
+
+        public void setLIVE_BEGIN(double LIVE_BEGIN) {
+            this.LIVE_BEGIN = LIVE_BEGIN;
+        }
+
+        public double getLIVE_END() {
+            return LIVE_END;
+        }
+
+        public void setLIVE_END(double LIVE_END) {
+            this.LIVE_END = LIVE_END;
+        }
+
+        public double getBIRTH_BEGIN() {
+            return BIRTH_BEGIN;
+        }
+
+        public void setBIRTH_BEGIN(double BIRTH_BEGIN) {
+            this.BIRTH_BEGIN = BIRTH_BEGIN;
+        }
+
+        public double getBIRTH_END() {
+            return BIRTH_END;
+        }
+
+        public void setBIRTH_END(double BIRTH_END) {
+            this.BIRTH_END = BIRTH_END;
+        }
+
+        public boolean isXor() {
+            return xor;
+        }
+
+        public void setXor(boolean xor) {
+            this.xor = xor;
+        }
+
+
     }
 
 }

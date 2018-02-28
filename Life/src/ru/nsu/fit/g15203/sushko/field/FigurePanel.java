@@ -5,27 +5,30 @@ import ru.nsu.fit.g15203.sushko.hex.bresenhem.BresDrawLine;
 import ru.nsu.fit.g15203.sushko.hex.span.FillerSpan;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class FigurePanel extends JPanel{
-    private static final int widthCount = 7;
-    private static final int heightCount = 8;
-    private static final int radiusFigure = 50;
-
     private boolean isPlay = false;
 
     private HexField field;
+    private HexField.DataField lastState = null;
 
+    private boolean stateChange = false;
     private Timer timer = new Timer();
     private TimerTask timerTask = new MyTask();
     private FileMng fileMng;
     private JLabel label;
 
     public FigurePanel() {
+        int widthCount = 7;
+        int heightCount = 8;
+        int radiusFigure = 30;
         this.field = new HexField(new BresDrawLine(), new FillerSpan(), radiusFigure, widthCount, heightCount);
         this.fileMng = new FileMng(field);
         label = new JLabel(new ImageIcon(field.getBufferedImage()));
@@ -35,15 +38,45 @@ public class FigurePanel extends JPanel{
         label.addMouseMotionListener(myMouseListener);
 
         add(label);
+        stateChange = false;
+        lastState = field.getActualState();
+
         repaintField();
+    }
+
+    public void newGame(){
+        field.setXorEnable(lastState.isXor());
+        field.resetField();
+        field.setSizeField(lastState.getWidth(), lastState.getHeight());
+        field.setWidthLine(lastState.getWidthLine());
+        field.setRadiusHex(lastState.getRadius());
+        field.setFstImpact(lastState.getFST_IMPACT());
+        field.setSndImpact(lastState.getSND_IMPACT());
+        field.setLiveBegin(lastState.getLIVE_BEGIN());
+        field.setLiveEnd(lastState.getLIVE_END());
+        field.setBirthBegin(lastState.getBIRTH_BEGIN());
+        field.setBirthEnd(lastState.getBIRTH_END());
+        ArrayList<Point> temp = lastState.getLivePoints();
+        for(Point point: temp){
+            field.setLifeHex(point.x, point.y);
+        }
+        recalculate();
+        reloadImage();
+        repaintField();
+
     }
 
     public void nextStep(){
         if(isPlay){
             return;
         }
+        stateChange = true;
         field.nextStep();
         repaintField();
+    }
+
+    public void recalculate(){
+        field.reCalculateField();
     }
 
     public void repaintField(){
@@ -56,6 +89,8 @@ public class FigurePanel extends JPanel{
             stopGame();
         }
         field.resetField();
+        stateChange = false;
+        lastState = field.getActualState();
         repaintField();
     }
 
@@ -74,7 +109,7 @@ public class FigurePanel extends JPanel{
         repaintField();
     }
 
-    private void stopGame(){
+    public void stopGame(){
         timer.cancel();
         timer.purge();
         timer = new Timer();
@@ -83,23 +118,109 @@ public class FigurePanel extends JPanel{
     }
 
     public void saveState(String file){
+        if(file.equals("nullnull")){
+            return;
+        }
+        stateChange = false;
         fileMng.saveState(file);
     }
 
     public void loadState(String file){
+        if(file.equals("nullnull")){
+            return;
+        }
         try {
             fileMng.loadState(file);
+            stateChange = false;
+            lastState = field.getActualState();
         } catch (ParseFileException e){
             e.printStackTrace();
             return;
         }
 
+        reloadImage();
+        repaintField();
+    }
+
+    public void reloadImage(){
         label.setIcon(new ImageIcon(field.getBufferedImage()));
         label.revalidate();
 
         add(label);
         revalidate();
-        repaintField();
+    }
+
+    public boolean isXorMode(){
+        return field.isXorEnable();
+    }
+
+    public double getFstImpact() {
+        return field.getFstImpact();
+    }
+
+    public double getSndImpact(){
+        return field.getSndImpact();
+    }
+
+    public double getLiveBegin() {
+        return field.getLiveBegin();
+    }
+
+    public double getLiveEnd() {
+        return field.getLiveEnd();
+    }
+
+    public double getBirthBegin() {
+        return field.getBirthBegin();
+    }
+
+    public double getBirthEnd() {
+        return field.getBirthEnd();
+    }
+
+    public int getRadiusFigure() {
+        return field.getRadius();
+    }
+
+    public int getWidthLine(){
+        return field.getWidthLine();
+    }
+
+    public int getWidthCount(){
+        return field.getWidth();
+    }
+
+    public int getHeightCount(){
+        return field.getHeight();
+    }
+
+    public boolean isStateChange() {
+        return stateChange;
+    }
+
+    public void setImpact(double first, double second, double liveBeg, double liveEnd, double birthBeg, double birthEnd){
+        field.setFstImpact(first);
+        field.setSndImpact(second);
+        field.setLiveBegin(liveBeg);
+        field.setLiveEnd(liveEnd);
+        field.setBirthBegin(birthBeg);
+        field.setBirthEnd(birthEnd);
+    }
+
+    public void setXor(boolean flag){
+        field.setXorEnable(flag);
+    }
+
+    public void setRadius(int radius){
+        field.setRadiusHex(radius);
+    }
+
+    public void setField(int widthCount, int heightCount){
+        field.setSizeField(widthCount, heightCount);
+    }
+
+    public void setWidthLine(int widthLine){
+        field.setWidthLine(widthLine);
     }
 
 
@@ -108,6 +229,7 @@ public class FigurePanel extends JPanel{
             if(isPlay || e.getX() < 0 || e.getY() < 0){
                 return;
             }
+            stateChange = true;
             field.elemChoise(e.getX(), e.getY(), false);
             repaint();
         }
@@ -123,6 +245,7 @@ public class FigurePanel extends JPanel{
             if(isPlay || e.getX() < 0 || e.getY() < 0){
                 return;
             }
+            stateChange = true;
             field.elemChoise(e.getX(), e.getY(), true);
             repaint();
         }
