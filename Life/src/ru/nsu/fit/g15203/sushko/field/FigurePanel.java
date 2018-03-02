@@ -17,7 +17,6 @@ public class FigurePanel extends JPanel{
     private boolean isPlay = false;
 
     private HexField field;
-    private HexField.DataField lastState = null;
 
     private boolean stateChange = false;
     private Timer timer = new Timer();
@@ -39,31 +38,12 @@ public class FigurePanel extends JPanel{
 
         add(label);
         stateChange = false;
-        lastState = field.getActualState();
 
         repaintField();
     }
 
-    public void newGame(){
-        field.setXorEnable(lastState.isXor());
-        field.resetField();
-        field.setSizeField(lastState.getWidth(), lastState.getHeight());
-        field.setWidthLine(lastState.getWidthLine());
-        field.setRadiusHex(lastState.getRadius());
-        field.setFstImpact(lastState.getFST_IMPACT());
-        field.setSndImpact(lastState.getSND_IMPACT());
-        field.setLiveBegin(lastState.getLIVE_BEGIN());
-        field.setLiveEnd(lastState.getLIVE_END());
-        field.setBirthBegin(lastState.getBIRTH_BEGIN());
-        field.setBirthEnd(lastState.getBIRTH_END());
-        ArrayList<Point> temp = lastState.getLivePoints();
-        for(Point point: temp){
-            field.setLifeHex(point.x, point.y);
-        }
-        recalculate();
-        reloadImage();
-        repaintField();
-
+    public String lastLoadFile(){
+        return fileMng.getLastParseFile();
     }
 
     public void nextStep(){
@@ -90,7 +70,6 @@ public class FigurePanel extends JPanel{
         }
         field.resetField();
         stateChange = false;
-        lastState = field.getActualState();
         repaintField();
     }
 
@@ -132,7 +111,6 @@ public class FigurePanel extends JPanel{
         try {
             fileMng.loadState(file);
             stateChange = false;
-            lastState = field.getActualState();
         } catch (ParseFileException e){
             e.printStackTrace();
             return;

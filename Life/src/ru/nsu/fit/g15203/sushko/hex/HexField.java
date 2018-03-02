@@ -415,138 +415,21 @@ public class HexField{
         }
 
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
-        bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getImpactState(x, y)), widthCenterHex[x][y] - 3,
-                heightCenterHex[x][y] + 3);
-    }
+        Font font = new Font("Italic", Font.ITALIC,radius / 2);
+        Graphics graphics = bufferedImage.getGraphics();
+        FontMetrics metrics = graphics.getFontMetrics(font);
 
-    public DataField getActualState(){
-        DataField dataField = new DataField();
-        dataField.setWidth(lifeField.getWidth());
-        dataField.setHeight(lifeField.getHeight());
-        dataField.setWidthLine(widthLine);
-        dataField.setRadius(enterRadius);
-        dataField.setFST_IMPACT(lifeField.getFstImpact());
-        dataField.setSND_IMPACT(lifeField.getSndImpact());
-        dataField.setLIVE_BEGIN(lifeField.getLiveBegin());
-        dataField.setLIVE_END(lifeField.getLiveEnd());
-        dataField.setBIRTH_BEGIN(lifeField.getBirthBegin());
-        dataField.setBIRTH_END(lifeField.getBirthEnd());
-        dataField.setXor(xorEnable);
-        dataField.setLivePoints(lifeField.getLifeList());
-        return dataField;
-    }
+        graphics.setColor(Color.DARK_GRAY.darker());
+        graphics.setFont(font);
 
-    public static class DataField{
-        private int width;
-        private int height;
-        private int widthLine;
-        private int radius;
-        private ArrayList<Point> livePoints;
-        private double FST_IMPACT;
-        private double SND_IMPACT;
-        private double LIVE_BEGIN;
-        private double LIVE_END;
-        private double BIRTH_BEGIN;
-        private double BIRTH_END;
-        private boolean xor;
+        String str = decimalFormat.format(lifeField.getImpactState(x, y));
 
-        public int getWidth() {
-            return width;
-        }
+        int xPoz = widthCenterHex[x][y] - metrics.stringWidth(str) / 2 + (radius % 2 == 0 ? 0 : 1);
+        int yPoz = heightCenterHex[x][y] + radius / 4 - 1;
 
-        public void setWidth(int width) {
-            this.width = width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
-        public int getWidthLine() {
-            return widthLine;
-        }
-
-        public void setWidthLine(int widthLine) {
-            this.widthLine = widthLine;
-        }
-
-        public int getRadius() {
-            return radius;
-        }
-
-        public void setRadius(int radius) {
-            this.radius = radius;
-        }
-
-        public ArrayList<Point> getLivePoints() {
-            return livePoints;
-        }
-
-        public void setLivePoints(ArrayList<Point> livePoints) {
-            this.livePoints = new ArrayList<>(livePoints);
-        }
-
-        public double getFST_IMPACT() {
-            return FST_IMPACT;
-        }
-
-        public void setFST_IMPACT(double FST_IMPACT) {
-            this.FST_IMPACT = FST_IMPACT;
-        }
-
-        public double getSND_IMPACT() {
-            return SND_IMPACT;
-        }
-
-        public void setSND_IMPACT(double SND_IMPACT) {
-            this.SND_IMPACT = SND_IMPACT;
-        }
-
-        public double getLIVE_BEGIN() {
-            return LIVE_BEGIN;
-        }
-
-        public void setLIVE_BEGIN(double LIVE_BEGIN) {
-            this.LIVE_BEGIN = LIVE_BEGIN;
-        }
-
-        public double getLIVE_END() {
-            return LIVE_END;
-        }
-
-        public void setLIVE_END(double LIVE_END) {
-            this.LIVE_END = LIVE_END;
-        }
-
-        public double getBIRTH_BEGIN() {
-            return BIRTH_BEGIN;
-        }
-
-        public void setBIRTH_BEGIN(double BIRTH_BEGIN) {
-            this.BIRTH_BEGIN = BIRTH_BEGIN;
-        }
-
-        public double getBIRTH_END() {
-            return BIRTH_END;
-        }
-
-        public void setBIRTH_END(double BIRTH_END) {
-            this.BIRTH_END = BIRTH_END;
-        }
-
-        public boolean isXor() {
-            return xor;
-        }
-
-        public void setXor(boolean xor) {
-            this.xor = xor;
-        }
-
-
+        graphics.drawString(str, xPoz, yPoz);
+//        bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getImpactState(x, y)), widthCenterHex[x][y] - 3,
+//                heightCenterHex[x][y] + 3);
     }
 
 }

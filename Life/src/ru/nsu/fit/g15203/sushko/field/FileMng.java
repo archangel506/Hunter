@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class FileMng {
     private static final int NEED_LOAD = -1;
     private HexField field;
+    private String lastParseFile = null;
 
 
     public FileMng(HexField field) {
@@ -106,6 +107,8 @@ public class FileMng {
             }
         }
 
+        lastParseFile = filename;
+
 
         field.resetField();
         field.setSizeField(width, height);
@@ -115,6 +118,10 @@ public class FileMng {
             field.setLifeHex(point.y, point.x);
         }
         field.reCalculateField();
+    }
+
+    public String getLastParseFile() {
+        return lastParseFile;
     }
 
     private Point parseTwoSymb(String line) throws ParseFileException {
@@ -208,5 +215,4 @@ public class FileMng {
             return result;
         }
     }
-
 }

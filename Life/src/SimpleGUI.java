@@ -15,6 +15,7 @@ public class SimpleGUI extends JFrame {
     private static final String pathRes = "src/ru/nsu/fit/g15203/sushko/res/icons/";
     private static final String nextIcon = "next.gif";
     private static final String saveIcon = "save.gif";
+    private static final String saveAsIcon = "saveAs.gif";
     private static final String newIcon = "new.gif";
     private static final String openIcon = "open.gif";
     private static final String resetGameIcon = "resetGame.gif";
@@ -26,6 +27,13 @@ public class SimpleGUI extends JFrame {
 
     private static final int MINIMUM_WIDTH = 800;
     private static final int MINIMUM_HEIGHT = 600;
+    private static final int MINIMUM_COUNT = 4;
+    private static final int MAXIMUM_COUNT = 50;
+    private static final int MINIMUM_RADIUS = 5;
+    private static final int MAXIMUM_RADIUS = 50;
+    private static final int MINIMUM_LINE = 1;
+    private static final int MAXIMUM_LINE = 10;
+
 
     private JMenuBar menuBar = new JMenuBar();
     private FigurePanel figurePanel;
@@ -71,9 +79,14 @@ public class SimpleGUI extends JFrame {
         toolBar.add(open);
 
         JButton save = new JButton(new ImageIcon(pathRes + saveIcon));
-        save.addActionListener(e -> showDialogSaveFile());
+        save.addActionListener(e -> savePress());
         save.setToolTipText("Save");
         toolBar.add(save);
+
+        JButton saveAs = new JButton(new ImageIcon(pathRes + saveAsIcon));
+        saveAs.addActionListener(e -> showDialogSaveFile());
+        saveAs.setToolTipText("Save as...");
+        toolBar.add(saveAs);
 
         toolBar.addSeparator();
 
@@ -124,8 +137,11 @@ public class SimpleGUI extends JFrame {
         itemOpen.addActionListener(e -> showDialogLoadFile());
         jMenuFile.add(itemOpen);
         JMenuItem itemSave = new JMenuItem("Save");
-        itemSave.addActionListener(e -> showDialogSaveFile());
+        itemSave.addActionListener(e -> savePress());
         jMenuFile.add(itemSave);
+        JMenuItem itemSaveAs = new JMenuItem("Save as...");
+        itemSaveAs.addActionListener(e -> showDialogSaveFile());
+        jMenuFile.add(itemSaveAs);
         menuBar.add(jMenuFile);
 
         JMenu jMenuGame = new JMenu("Game");
@@ -171,10 +187,22 @@ public class SimpleGUI extends JFrame {
                     JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 showDialogSaveFile();
+                figurePanel.resetField();
+                createSettingsDialog();
             }
+        } else{
+            figurePanel.resetField();
+            createSettingsDialog();
         }
+    }
 
-        figurePanel.newGame();
+    private void savePress(){
+        String path = figurePanel.lastLoadFile();
+        if(path == null) {
+            showDialogSaveFile();
+        } else{
+            figurePanel.saveState(path);
+        }
     }
 
     private void createSettingsDialog() {
@@ -197,13 +225,13 @@ public class SimpleGUI extends JFrame {
         mainParameters.add(nameSLiders);
 
         JPanel sliders = new JPanel(new GridLayout(6, 1));
-        JSlider sliderWidth = new JSlider(JSlider.HORIZONTAL, 4, 50, 10);
+        JSlider sliderWidth = new JSlider(JSlider.HORIZONTAL, MINIMUM_COUNT, MAXIMUM_COUNT, 10);
         sliderWidth.setValue(figurePanel.getWidthCount());
-        JSlider sliderHeight = new JSlider(JSlider.HORIZONTAL, 4, 50, 10);
+        JSlider sliderHeight = new JSlider(JSlider.HORIZONTAL, MINIMUM_COUNT, MAXIMUM_COUNT, 10);
         sliderHeight.setValue(figurePanel.getHeightCount());
-        JSlider sliderLine = new JSlider(JSlider.HORIZONTAL, 1, 8, 1);
+        JSlider sliderLine = new JSlider(JSlider.HORIZONTAL, MINIMUM_LINE, MAXIMUM_LINE, 1);
         sliderLine.setValue(figurePanel.getWidthLine());
-        JSlider sliderRadius = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+        JSlider sliderRadius = new JSlider(JSlider.HORIZONTAL, MINIMUM_RADIUS, MAXIMUM_RADIUS, 10);
         sliderRadius.setValue(figurePanel.getRadiusFigure());
         sliders.add(sliderWidth);
         sliders.add(sliderHeight);
@@ -348,18 +376,105 @@ public class SimpleGUI extends JFrame {
                     || radiusField.getText().isEmpty() || firstField.getText().isEmpty()  || sndField.getText().isEmpty()
                     || liveBeginField.getText().isEmpty()  || liveEndField.getText().isEmpty()  || birthBeginField.getText().isEmpty()
                     || birthEndField.getText().isEmpty() ){
+                JOptionPane.showMessageDialog(this,
+                        "Please, write value",
+                        "Empty field",
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
-            figurePanel.setField(Integer.parseInt(widthField.getText()), Integer.parseInt(heightField.getText()));
-            figurePanel.setWidthLine(Integer.parseInt(lineField.getText()));
-            figurePanel.setRadius(Integer.parseInt(radiusField.getText()));
-            figurePanel.setImpact(Double.valueOf(firstField.getText()),
-                    Double.valueOf(sndField.getText()),
-                    Double.valueOf(liveBeginField.getText()),
-                    Double.valueOf(liveEndField.getText()),
-                    Double.valueOf(birthBeginField.getText()),
-                    Double.valueOf(birthEndField.getText()));
+            int width = Integer.parseInt(widthField.getText());
+            int height = Integer.parseInt(heightField.getText());
+            int radius = Integer.parseInt(radiusField.getText());
+            int widthLine = Integer.parseInt(lineField.getText());
+            if(width < MINIMUM_COUNT){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent width. Width set minimum",
+                        "Incorrent width",
+                        JOptionPane.INFORMATION_MESSAGE);
+                width = MINIMUM_COUNT;
+            }
+            if(width > MAXIMUM_COUNT){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent width. Width set maximum",
+                        "Incorrent width",
+                        JOptionPane.INFORMATION_MESSAGE);
+                width = MAXIMUM_COUNT;
+            }
+
+            if(height < MINIMUM_COUNT){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent height. Height set minimum",
+                        "Incorrent height",
+                        JOptionPane.INFORMATION_MESSAGE);
+                height = MINIMUM_COUNT;
+            }
+            if(height > MAXIMUM_COUNT ){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent height. Height set maximum",
+                        "Incorrent height",
+                        JOptionPane.INFORMATION_MESSAGE);
+                height = MAXIMUM_COUNT;
+            }
+
+            if(widthLine < MINIMUM_LINE){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent width line. Width line set minimum",
+                        "Incorrent width line",
+                        JOptionPane.INFORMATION_MESSAGE);
+                widthLine = MINIMUM_LINE;
+            }
+
+            if(widthLine > MAXIMUM_LINE){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent width line. Width line set maximum",
+                        "Incorrent width line",
+                        JOptionPane.INFORMATION_MESSAGE);
+                widthLine = MAXIMUM_LINE;
+            }
+            if(radius < MINIMUM_RADIUS){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent radius. Radius set minimum",
+                        "Incorrent radius",
+                        JOptionPane.INFORMATION_MESSAGE);
+                radius = MINIMUM_RADIUS;
+            }
+
+            if(radius > MAXIMUM_RADIUS ){
+                JOptionPane.showMessageDialog(this,
+                        "Incorrent radius. Radius set maximum",
+                        "Incorrent radius",
+                        JOptionPane.INFORMATION_MESSAGE);
+                radius = MAXIMUM_RADIUS;
+            }
+
+            figurePanel.setField(width, height);
+            figurePanel.setWidthLine(widthLine);
+            figurePanel.setRadius(radius);
+
+            double firstImpact = Double.valueOf(firstField.getText());
+            double secondImpact = Double.valueOf(sndField.getText());
+            double liveBeginDecimal = Double.valueOf(liveBeginField.getText());
+            double liveEndDecimal = Double.valueOf(liveEndField.getText());
+            if( liveBeginDecimal > liveEndDecimal){
+                JOptionPane.showMessageDialog(this,
+                        "Please, write correct live value",
+                        "Empty field",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            double birthBeginDecimal = Double.valueOf(birthBeginField.getText());
+            double birthEndDecimal = Double.valueOf(birthEndField.getText());
+            if( birthBeginDecimal > birthEndDecimal || birthBeginDecimal >= liveEndDecimal){
+                JOptionPane.showMessageDialog(this,
+                        "Please, write correct birth value",
+                        "Empty field",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            figurePanel.setImpact(firstImpact, secondImpact,
+                    liveBeginDecimal, liveEndDecimal,
+                    birthBeginDecimal, birthEndDecimal);
             figurePanel.recalculate();
             figurePanel.setXor(xorB.isSelected());
             figurePanel.reloadImage();
