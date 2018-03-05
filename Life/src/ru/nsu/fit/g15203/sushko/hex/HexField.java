@@ -11,6 +11,7 @@ public class HexField{
     public static final int COLOR_DEAD = Color.GRAY.getRGB();
     public static final int COLOR_LIFE = Color.ORANGE.getRGB();
     public static final int COLOR_LINE = Color.RED.getRGB();
+    private static final int MINIMUM__RADIUS_SHOW_IMPACT = 14;
 
     private DrawerLine drawerLine;
     private FillerHex fillerHex;
@@ -46,9 +47,6 @@ public class HexField{
         for (int i = 0; i < lifeField.getHeight(); ++i) {
             for (int j = 0; j < ((i % 2 == 0) ? lifeField.getWidth() : lifeField.getWidth() - 1); ++j) {
                 drawHexagon(i, j);
-                if (showImpact) {
-                    drawText(i, j);
-                }
             }
         }
     }
@@ -61,7 +59,7 @@ public class HexField{
         lastIndex = null;
     }
 
-    public void elemChoise(int widhtPixel, int heightPixel, boolean longPress) {
+    public void elemChoise(int widhtPixel, int heightPixel) {
         if (bufferedImage.getWidth() <= widhtPixel || bufferedImage.getHeight() <= heightPixel
                 || !inHex(widhtPixel, heightPixel)) {
             offMove();
@@ -156,7 +154,19 @@ public class HexField{
             isLifeElem = true;
         }
         lifeField.setState(candidatHeight, candidatWidth, isLifeElem);
-        drawField();
+        drawHexAndNeighbors(candidatHeight, candidatWidth);
+    }
+
+    private void drawHexAndNeighbors(int candidatHeight, int candidatWidth) {
+        drawHexagon(candidatHeight, candidatWidth);
+        ArrayList<Point> firstNeighbors = lifeField.getFirstNeighbor(candidatHeight, candidatWidth);
+        ArrayList<Point> secondNeighbors = lifeField.getSecondNeighbor(candidatHeight, candidatWidth, candidatHeight % 2 == 0);
+        for(Point neighbor: firstNeighbors){
+            drawHexagon(neighbor.x, neighbor.y);
+        }
+        for(Point neighbor: secondNeighbors){
+            drawHexagon(neighbor.x, neighbor.y);
+        }
     }
 
     public void nextStep() {
@@ -368,6 +378,10 @@ public class HexField{
         } else {
             fillerHex.fillHex(widthCenterHex[i][j], heightCenterHex[i][j], COLOR_DEAD, bufferedImage);
         }
+
+        if (showImpact) {
+            drawText(i, j);
+        }
     }
 
     private int[] getXCoordHex(int centerX) {
@@ -407,6 +421,10 @@ public class HexField{
     }
 
     private void drawText(int x, int y) {
+        int innerRadius = radius - widthLine;
+        if(innerRadius < MINIMUM__RADIUS_SHOW_IMPACT){
+            return;
+        }
         String pattern;
         if (lifeField.getImpactState(x,y) % 1 == 0) {
             pattern = "##0";
@@ -415,21 +433,18 @@ public class HexField{
         }
 
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
-        Font font = new Font("Italic", Font.ITALIC,radius / 2);
-        Graphics graphics = bufferedImage.getGraphics();
-        FontMetrics metrics = graphics.getFontMetrics(font);
 
-        graphics.setColor(Color.DARK_GRAY.darker());
+        Font font = new Font("Plain", Font.PLAIN,innerRadius / 2);
+
+        Graphics graphics = bufferedImage.getGraphics();
         graphics.setFont(font);
+        FontMetrics metrics = graphics.getFontMetrics();
 
         String str = decimalFormat.format(lifeField.getImpactState(x, y));
-
-        int xPoz = widthCenterHex[x][y] - metrics.stringWidth(str) / 2 + (radius % 2 == 0 ? 0 : 1);
-        int yPoz = heightCenterHex[x][y] + radius / 4 - 1;
-
+        int xPoz = widthCenterHex[x][y] - metrics.stringWidth(str) / 2;
+        int yPoz = heightCenterHex[x][y] + innerRadius / 4 - 1;
         graphics.drawString(str, xPoz, yPoz);
-//        bufferedImage.getGraphics().drawString(decimalFormat.format(lifeField.getImpactState(x, y)), widthCenterHex[x][y] - 3,
-//                heightCenterHex[x][y] + 3);
+        bufferedImage.setRGB(xPoz, yPoz, Color.BLUE.getRGB());
     }
 
 }

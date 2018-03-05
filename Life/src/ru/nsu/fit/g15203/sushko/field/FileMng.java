@@ -18,8 +18,8 @@ public class FileMng {
     }
 
 
-    public void saveState(String fileName) {
-        if (fileName == null) {
+    public void saveState(File file) {
+        if (file == null) {
             return;
         }
 
@@ -29,7 +29,6 @@ public class FileMng {
         int widthLine = field.getWidthLine();
         ArrayList<Point> arrayList = field.getLifeHex();
 
-        File file = new File(fileName);
         if (file.exists()) {
             file.delete();
         }
@@ -53,11 +52,12 @@ public class FileMng {
         }
     }
 
-    public void loadState(String filename) throws ParseFileException {
-        if(filename == null){
+    public void loadState(File file) throws ParseFileException {
+        if(file == null){
             return;
         }
-        File file = new File(filename);
+
+
         ArrayList<Point> arrayList = new ArrayList<>();
         int width = -1;
         int height = -1;
@@ -107,7 +107,7 @@ public class FileMng {
             }
         }
 
-        lastParseFile = filename;
+        lastParseFile = file.getAbsolutePath();
 
 
         field.resetField();

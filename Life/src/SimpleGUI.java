@@ -7,6 +7,9 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +20,7 @@ public class SimpleGUI extends JFrame {
     private static final String saveIcon = "save.gif";
     private static final String saveAsIcon = "saveAs.gif";
     private static final String newIcon = "new.gif";
+    private static final String pauseIcon = "pause.png";
     private static final String openIcon = "open.gif";
     private static final String resetGameIcon = "resetGame.gif";
     private static final String aboutIcon = "about.gif";
@@ -24,6 +28,8 @@ public class SimpleGUI extends JFrame {
     private static final String parametersIcon = "parameters.gif";
     private static final String aboutDialogIcon = "aboutDialog.jpg";
     private static final String impactIcon = "impact.png";
+    private static final String xorIcon = "xor.png";
+    private static final String replaceIcon = "replace.png";
 
     private static final int MINIMUM_WIDTH = 800;
     private static final int MINIMUM_HEIGHT = 600;
@@ -53,18 +59,93 @@ public class SimpleGUI extends JFrame {
     }
 
     private void showDialogSaveFile() {
-        FileDialog fileDialog = new FileDialog(this, "Save", FileDialog.SAVE);
-        fileDialog.show();
-        figurePanel.saveState(fileDialog.getDirectory() + fileDialog.getFile());
+        JFileChooser fileChooser = new JFileChooser();
+        int ret = fileChooser.showSaveDialog(this);
+        if(ret == JFileChooser.APPROVE_OPTION){
+            figurePanel.saveState(fileChooser.getSelectedFile());
+        }
+    }
+
+    private void askSaveAndLoadState(){
+        if(figurePanel.isStateChange()){
+            int result = JOptionPane.showConfirmDialog(this,
+                    "Save progress?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                showDialogSaveFile();
+            }
+        }
+        showDialogLoadFile();
     }
 
     private void showDialogLoadFile() {
-        FileDialog fileDialog = new FileDialog(this, "Load", FileDialog.LOAD);
-        fileDialog.show();
-        figurePanel.loadState(fileDialog.getDirectory() + fileDialog.getFile());
+        JFileChooser fileChooser = new JFileChooser();
+        int ret = fileChooser.showSaveDialog(this);
+        if(ret == JFileChooser.APPROVE_OPTION){
+            figurePanel.loadState(fileChooser.getSelectedFile());
+        }
     }
 
     private void addMainInterface() {
+        AboutActionListener aboutActionListener = new AboutActionListener();
+
+        JMenu jMenuFile = new JMenu("File");
+        JMenuItem itemNew = new JMenuItem("New");
+        itemNew.addActionListener(e -> newGame());
+        jMenuFile.add(itemNew);
+        JMenuItem itemOpen = new JMenuItem("Open");
+        itemOpen.addActionListener(e -> askSaveAndLoadState());
+        jMenuFile.add(itemOpen);
+        JMenuItem itemSave = new JMenuItem("Save");
+        itemSave.addActionListener(e -> savePress());
+        jMenuFile.add(itemSave);
+        JMenuItem itemSaveAs = new JMenuItem("Save as...");
+        itemSaveAs.addActionListener(e -> showDialogSaveFile());
+        jMenuFile.add(itemSaveAs);
+        menuBar.add(jMenuFile);
+
+        JMenu jMenuGame = new JMenu("Game");
+        JMenuItem itemPlay = new JMenuItem("Play");
+        itemPlay.addActionListener(e -> figurePanel.play());
+        jMenuGame.add(itemPlay);
+        JMenuItem itemStep = new JMenuItem("Next step");
+        itemStep.addActionListener(e -> figurePanel.nextStep());
+        jMenuGame.add(itemStep);
+        JMenuItem itemPause = new JMenuItem("Pause");
+        itemPause.addActionListener(e -> figurePanel.stopGame());
+        jMenuGame.add(itemPause);
+        JMenuItem itemReset = new JMenuItem("Reset");
+        itemReset.addActionListener((event) -> figurePanel.resetField());
+        jMenuGame.add(itemReset);
+        JMenuItem itemParameters = new JMenuItem("Parameters");
+        itemParameters.addActionListener(e -> {
+            figurePanel.stopGame();
+            createSettingsDialog(false);
+        });
+        jMenuGame.add(itemParameters);
+        JMenuItem itemImpact = new JMenuItem("Show impact");
+        itemImpact.addActionListener(e -> figurePanel.showImpact());
+        jMenuGame.add(itemImpact);
+        ButtonGroup group = new ButtonGroup();
+        JCheckBoxMenuItem jCheckBoxMenuItemXor = new JCheckBoxMenuItem("Xor");
+        jCheckBoxMenuItemXor.setSelected(figurePanel.isXorMode());
+        group.add(jCheckBoxMenuItemXor);
+        jCheckBoxMenuItemXor.addActionListener(e -> figurePanel.setXor(true));
+        jMenuGame.add(jCheckBoxMenuItemXor);
+        JCheckBoxMenuItem jCheckBoxMenuItemReplace = new JCheckBoxMenuItem("Replace");
+        jCheckBoxMenuItemReplace.setSelected(!figurePanel.isXorMode());
+        jCheckBoxMenuItemReplace.addActionListener(e -> figurePanel.setXor(false));
+        group.add(jCheckBoxMenuItemReplace);
+        jMenuGame.add(jCheckBoxMenuItemReplace);
+        menuBar.add(jMenuGame);
+
+        JMenu jAbout = new JMenu("About");
+        JMenuItem itemAbout = new JMenuItem("About");
+        itemAbout.addActionListener(aboutActionListener);
+        jAbout.add(itemAbout);
+        menuBar.add(jAbout);
+
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
 
@@ -74,7 +155,7 @@ public class SimpleGUI extends JFrame {
         toolBar.add(newB);
 
         JButton open = new JButton(new ImageIcon(pathRes + openIcon));
-        open.addActionListener(e -> showDialogLoadFile());
+        open.addActionListener(e -> askSaveAndLoadState());
         open.setToolTipText("Open");
         toolBar.add(open);
 
@@ -100,6 +181,11 @@ public class SimpleGUI extends JFrame {
         nextStep.setToolTipText("Next Step");
         toolBar.add(nextStep);
 
+        JButton pauseGameB = new JButton(new ImageIcon(pathRes + pauseIcon));
+        pauseGameB.addActionListener(e -> figurePanel.stopGame());
+        pauseGameB.setToolTipText("Pause");
+        toolBar.add(pauseGameB);
+
         JButton newGame = new JButton(new ImageIcon(pathRes + resetGameIcon));
         newGame.addActionListener((e -> figurePanel.resetField()));
         newGame.setToolTipText("Reset game");
@@ -109,12 +195,30 @@ public class SimpleGUI extends JFrame {
         param.setToolTipText("Parameters");
         param.addActionListener(e -> {
             figurePanel.stopGame();
-            createSettingsDialog();
+            createSettingsDialog(false);
         });
         toolBar.add(param);
 
+        JButton xorButton = new JButton(new ImageIcon(pathRes + xorIcon));
+        xorButton.setToolTipText("Xor");
+        xorButton.addActionListener(e -> {
+            figurePanel.setXor(true);
+            jCheckBoxMenuItemXor.setState(true);
+            jCheckBoxMenuItemReplace.setState(false);
+        }) ;
+        toolBar.add(xorButton);
+
+        JButton replaceButton = new JButton(new ImageIcon(pathRes + replaceIcon));
+        replaceButton.setToolTipText("Replace");
+        replaceButton.addActionListener(e -> {
+            figurePanel.setXor(false);
+            jCheckBoxMenuItemXor.setState(false);
+            jCheckBoxMenuItemReplace.setState(true);
+        });
+        toolBar.add(replaceButton);
+
         JButton impact = new JButton(new ImageIcon(pathRes + impactIcon));
-        param.setToolTipText("Show impact");
+        impact.setToolTipText("Show impact");
         impact.addActionListener(e -> figurePanel.showImpact());
         toolBar.add(impact);
 
@@ -122,54 +226,12 @@ public class SimpleGUI extends JFrame {
         toolBar.addSeparator();
 
         JButton about = new JButton(new ImageIcon(pathRes + aboutIcon));
-        AboutActionListener aboutActionListener = new AboutActionListener(this);
         about.addActionListener(aboutActionListener);
         about.setToolTipText("About");
         toolBar.add(about);
 
         add(toolBar, BorderLayout.NORTH);
 
-        JMenu jMenuFile = new JMenu("File");
-        JMenuItem itemNew = new JMenuItem("New");
-        itemNew.addActionListener(e -> newGame());
-        jMenuFile.add(itemNew);
-        JMenuItem itemOpen = new JMenuItem("Open");
-        itemOpen.addActionListener(e -> showDialogLoadFile());
-        jMenuFile.add(itemOpen);
-        JMenuItem itemSave = new JMenuItem("Save");
-        itemSave.addActionListener(e -> savePress());
-        jMenuFile.add(itemSave);
-        JMenuItem itemSaveAs = new JMenuItem("Save as...");
-        itemSaveAs.addActionListener(e -> showDialogSaveFile());
-        jMenuFile.add(itemSaveAs);
-        menuBar.add(jMenuFile);
-
-        JMenu jMenuGame = new JMenu("Game");
-        JMenuItem itemPlay = new JMenuItem("Play");
-        itemPlay.addActionListener(e -> figurePanel.play());
-        jMenuGame.add(itemPlay);
-        JMenuItem itemStep = new JMenuItem("Next step");
-        itemStep.addActionListener(e -> figurePanel.nextStep());
-        jMenuGame.add(itemStep);
-        JMenuItem itemReset = new JMenuItem("Reset");
-        itemReset.addActionListener((event) -> figurePanel.resetField());
-        jMenuGame.add(itemReset);
-        JMenuItem itemParameters = new JMenuItem("Parameters");
-        itemParameters.addActionListener(e -> {
-            figurePanel.stopGame();
-            createSettingsDialog();
-        });
-        jMenuGame.add(itemParameters);
-        JMenuItem itemImpact = new JMenuItem("Show impact");
-        itemImpact.addActionListener(e -> figurePanel.showImpact());
-        jMenuGame.add(itemImpact);
-        menuBar.add(jMenuGame);
-
-        JMenu jAbout = new JMenu("About");
-        JMenuItem itemAbout = new JMenuItem("About");
-        itemAbout.addActionListener(aboutActionListener);
-        jAbout.add(itemAbout);
-        menuBar.add(jAbout);
 
         setMinimumSize(new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT));
         setPreferredSize(new Dimension(MINIMUM_WIDTH, 800));
@@ -181,19 +243,16 @@ public class SimpleGUI extends JFrame {
 
     private void newGame(){
         if(figurePanel.isStateChange()){
-            int result = JOptionPane.showConfirmDialog(null,
+            int result = JOptionPane.showConfirmDialog(this,
                     "Save progress?",
                     "Save",
                     JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 showDialogSaveFile();
-                figurePanel.resetField();
-                createSettingsDialog();
             }
-        } else{
-            figurePanel.resetField();
-            createSettingsDialog();
         }
+        createSettingsDialog(true);
+
     }
 
     private void savePress(){
@@ -201,11 +260,11 @@ public class SimpleGUI extends JFrame {
         if(path == null) {
             showDialogSaveFile();
         } else{
-            figurePanel.saveState(path);
+            figurePanel.saveState(new File(path));
         }
     }
 
-    private void createSettingsDialog() {
+    private void createSettingsDialog(boolean needReset) {
         JDialog jDialog = new JDialog(this, "settings", true);
         JPanel settings = new JPanel();
         settings.setLayout(new BoxLayout(settings, BoxLayout.Y_AXIS));
@@ -281,32 +340,48 @@ public class SimpleGUI extends JFrame {
         JTextField firstField = new JTextField();
         PlainDocument plainDocFRT = (PlainDocument) firstField.getDocument();
         plainDocFRT.setDocumentFilter(new DoubleFilter());
-        firstField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getFstImpact()));
+        double value = figurePanel.getFstImpact();
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+        otherSymbols.setDecimalSeparator('.');
+        otherSymbols.setGroupingSeparator('.');
+        DecimalFormat decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        firstField.setText(decimalFormat.format(value));
         fieldParam.add(firstField);
         JTextField sndField = new JTextField();
         PlainDocument plainDocSND = (PlainDocument) sndField.getDocument();
         plainDocSND.setDocumentFilter(new DoubleFilter());
-        sndField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getSndImpact()));
+        value = figurePanel.getSndImpact();
+
+        decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        sndField.setText(decimalFormat.format(value));
         fieldParam.add(sndField);
         JTextField liveBeginField = new JTextField();
         PlainDocument plainDocBeg = (PlainDocument) liveBeginField.getDocument();
         plainDocBeg.setDocumentFilter(new DoubleFilter());
-        liveBeginField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getLiveBegin()));
+        value = figurePanel.getLiveBegin();
+        decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        liveBeginField.setText(decimalFormat.format(value));
         fieldParam.add(liveBeginField);
         JTextField liveEndField = new JTextField();
         PlainDocument plainDocEnd = (PlainDocument) liveEndField.getDocument();
         plainDocEnd.setDocumentFilter(new DoubleFilter());
-        liveEndField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getLiveEnd()));
+        value = figurePanel.getLiveEnd();
+        decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        liveEndField.setText(decimalFormat.format(value));
         fieldParam.add(liveEndField);
         JTextField birthBeginField = new JTextField();
         PlainDocument plainDocBirhBeg = (PlainDocument) birthBeginField.getDocument();
         plainDocBirhBeg.setDocumentFilter(new DoubleFilter());
-        birthBeginField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getBirthBegin()));
+        value = figurePanel.getBirthBegin();
+        decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        birthBeginField.setText(decimalFormat.format(value));
         fieldParam.add(birthBeginField);
         JTextField birthEndField = new JTextField();
         PlainDocument plainDocBirhEnd = (PlainDocument) birthEndField.getDocument();
         plainDocBirhEnd.setDocumentFilter(new DoubleFilter());
-        birthEndField.setText(String.format(Locale.ENGLISH, "%.1f", figurePanel.getBirthEnd()));
+        value = figurePanel.getBirthEnd();
+        decimalFormat = new DecimalFormat(getPattern(value), otherSymbols);
+        birthEndField.setText(decimalFormat.format(value));
         fieldParam.add(birthEndField);
         mainParameters.add(fieldParam);
 
@@ -472,6 +547,9 @@ public class SimpleGUI extends JFrame {
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
+            if(needReset) {
+                figurePanel.resetField();
+            }
             figurePanel.setImpact(firstImpact, secondImpact,
                     liveBeginDecimal, liveEndDecimal,
                     birthBeginDecimal, birthEndDecimal);
@@ -492,17 +570,20 @@ public class SimpleGUI extends JFrame {
         jDialog.setVisible(true);
     }
 
+    private String getPattern(double value){
+        if (value % 1 == 0) {
+            return  "##0";
+        } else {
+            return "##0.0";
+        }
+    }
+
 
     private class AboutActionListener implements ActionListener {
-        private JFrame frame;
-
-        public AboutActionListener(JFrame frame) {
-            this.frame = frame;
-        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(SimpleGUI.this,
                     "Version 0.1 alpha.\n" +
                             "FIT 15203 Sushko Denis\n" +
                             "Try Live",
@@ -579,7 +660,7 @@ public class SimpleGUI extends JFrame {
         @Override
         public void windowClosing(WindowEvent e) {
             if(figurePanel.isStateChange()) {
-                int result = JOptionPane.showConfirmDialog(null,
+                int result = JOptionPane.showConfirmDialog(SimpleGUI.this,
                         "Save progress?",
                         "Exit",
                         JOptionPane.YES_NO_OPTION);

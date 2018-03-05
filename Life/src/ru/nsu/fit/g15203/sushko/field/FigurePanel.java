@@ -75,7 +75,6 @@ public class FigurePanel extends JPanel{
 
     public void play(){
         if(isPlay){
-            stopGame();
             return;
         }
 
@@ -96,18 +95,12 @@ public class FigurePanel extends JPanel{
         isPlay = false;
     }
 
-    public void saveState(String file){
-        if(file.equals("nullnull")){
-            return;
-        }
+    public void saveState(File file){
         stateChange = false;
         fileMng.saveState(file);
     }
 
-    public void loadState(String file){
-        if(file.equals("nullnull")){
-            return;
-        }
+    public void loadState(File file){
         try {
             fileMng.loadState(file);
             stateChange = false;
@@ -208,7 +201,7 @@ public class FigurePanel extends JPanel{
                 return;
             }
             stateChange = true;
-            field.elemChoise(e.getX(), e.getY(), false);
+            field.elemChoise(e.getX(), e.getY());
             repaint();
         }
 
@@ -224,7 +217,7 @@ public class FigurePanel extends JPanel{
                 return;
             }
             stateChange = true;
-            field.elemChoise(e.getX(), e.getY(), true);
+            field.elemChoise(e.getX(), e.getY());
             repaint();
         }
     }
