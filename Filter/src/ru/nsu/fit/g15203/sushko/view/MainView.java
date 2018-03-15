@@ -6,6 +6,10 @@ import ru.nsu.fit.g15203.sushko.models.ImageBmp;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -33,6 +37,7 @@ public class MainView extends JFrame{
     private static final String sobelIcon = "sobel.png";
     private static final String gammaIcon = "gamma.png";
     private static final String definitionIcon = "definition.png";
+    private static final String rotationIcon = "rotation.png";
 
     private FileManager fileManager = new FileManager(this);
     private ParentZones parentZones = new ParentZones();
@@ -41,6 +46,7 @@ public class MainView extends JFrame{
     private JToolBar jToolBar;
     private JMenuBar jMenuBar;
     private JCheckBoxMenuItem itemSelect;
+    private Thread floydThread = null;
 
     private boolean stateChange = false;
 
@@ -126,6 +132,7 @@ public class MainView extends JFrame{
         jToolBar.add(createRobertsForToolbar());
         jToolBar.add(createGammaForToolbar());
         jToolBar.add(createDefinitionForToolbar());
+        jToolBar.add(createRotationForToolbar());
 
         jToolBar.addSeparator();
 
@@ -168,6 +175,7 @@ public class MainView extends JFrame{
         filtersMenu.add(createRobertsForMenu());
         filtersMenu.add(createGammaForMenu());
         filtersMenu.add(createDefinitionForMenu());
+        filtersMenu.add(createRotationForMenu());
         return filtersMenu;
     }
 
@@ -440,13 +448,27 @@ public class MainView extends JFrame{
         return order;
     }
 
+    private JMenuItem createRotationForMenu(){
+        JMenuItem orderItem = new JMenuItem("Rotation");
+        orderItem.addActionListener(e -> rotation());
+        return orderItem;
+    }
+
+    private JButton createRotationForToolbar(){
+        JButton order = new JButton(new ImageIcon(pathRes + rotationIcon));
+        order.addActionListener(e -> rotation());
+        order.setToolTipText("Rotation");
+        return order;
+    }
+
     private void negativeFilter(){
         if(!parentZones.isChoiseFragment()){
             JOptionPane.showMessageDialog(MainView.this, "Zone B is empty!");
             return;
         }
 
-        parentZones.negative();
+        new Thread(() -> parentZones.negative()).start();
+        stateChange = true;
     }
 
     private void aquarelleFilter(){
@@ -455,7 +477,8 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.aquarelle();
+        new Thread(() -> parentZones.aquarelle()).start();
+        stateChange = true;
     }
 
     private void doubleZoomFilter(){
@@ -464,7 +487,8 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.doubleZoom();
+        new Thread(() -> parentZones.doubleZoom()).start();
+        stateChange = true;
     }
 
     private void embassingFilter(){
@@ -473,7 +497,8 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.embassing();
+        new Thread(() -> parentZones.embassing()).start();
+        stateChange = true;
     }
 
     private void blackWhiteFilter(){
@@ -482,7 +507,8 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.blackWhite();
+        new Thread(() -> parentZones.blackWhite()).start();
+        stateChange = true;
     }
 
     private void gaussFilter(){
@@ -491,7 +517,8 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.gauss();
+        new Thread(() -> parentZones.gauss()).start();
+        stateChange = true;
     }
 
     private void floydFilter(){
@@ -540,20 +567,28 @@ public class MainView extends JFrame{
         saveButton.addActionListener(s ->  dialog.dispose());
 
         ChangeListener changeListener = change -> {
+            if(floydThread != null){
+                floydThread.stop();
+                floydThread = null;
+            }
             int red = rSlider.getValue();
 
             int green = gSlider.getValue();
 
             int blue = bSlider.getValue();
 
-            parentZones.floydStanberg(red - 1, green - 1, blue - 1);
+            floydThread = new Thread(() -> {
+                parentZones.floydStanberg(red, green, blue);
+                floydThread = null;
+            });
+            floydThread.start();
         };
 
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                parentZones.copyRight();
+                new Thread(() -> parentZones.copyRight()).start();
             }
         });
 
@@ -570,19 +605,18 @@ public class MainView extends JFrame{
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+        stateChange = true;
 }
 
     private void orderDither(){
-        if(true){
-            return;
-        }
         if(!parentZones.isChoiseFragment()){
             JOptionPane.showMessageDialog(MainView.this, "Zone B is empty!");
             return;
         }
 
 
-        parentZones.orderDither();
+        new Thread(() -> parentZones.orderDither()).start();
+        stateChange = true;
     }
 
     private void sobel(){
@@ -606,15 +640,14 @@ public class MainView extends JFrame{
 
         acceptButton.addActionListener(s ->  dialog.dispose());
 
-        ChangeListener changeListener = change -> {
-            parentZones.sobel(rSlider.getValue());
-        };
+        ChangeListener changeListener = change ->
+            new Thread(() -> parentZones.sobel(rSlider.getValue())).start();
 
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                parentZones.copyRight();
+                new Thread(() -> parentZones.copyRight()).start();
             }
         });
 
@@ -629,6 +662,7 @@ public class MainView extends JFrame{
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+        stateChange = true;
     }
 
     private void roberts(){
@@ -637,13 +671,13 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.roberts(125);
+        parentZones.roberts(25);
 
         final JDialog dialog = new JDialog();
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        final JSlider rSlider = new JSlider(JSlider.VERTICAL, 1, 255, 125);
+        final JSlider rSlider = new JSlider(JSlider.VERTICAL, 1, 255, 25);
         rSlider.setMajorTickSpacing(50);
         rSlider.setPaintTicks(true);
         rSlider.setPaintLabels(true);
@@ -652,15 +686,14 @@ public class MainView extends JFrame{
 
         acceptButton.addActionListener(s ->  dialog.dispose());
 
-        ChangeListener changeListener = change -> {
-            parentZones.roberts(rSlider.getValue());
-        };
+        ChangeListener changeListener = change ->
+            new Thread(() -> parentZones.roberts(rSlider.getValue())).start();
 
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                parentZones.copyRight();
+                new Thread(() -> parentZones.copyRight()).start();
             }
         });
 
@@ -675,6 +708,7 @@ public class MainView extends JFrame{
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+        stateChange = true;
     }
 
     private void gamma(){
@@ -698,15 +732,15 @@ public class MainView extends JFrame{
 
         acceptButton.addActionListener(s ->  dialog.dispose());
 
-        ChangeListener changeListener = change -> {
-            parentZones.gamma(rSlider.getValue());
-        };
+        ChangeListener changeListener = change ->
+                new Thread(() -> parentZones.gamma(rSlider.getValue())).start();
+
 
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                parentZones.copyRight();
+                new Thread(() -> parentZones.copyRight()).start();
             }
         });
 
@@ -721,6 +755,7 @@ public class MainView extends JFrame{
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+        stateChange = true;
     }
 
     private void definition(){
@@ -729,7 +764,59 @@ public class MainView extends JFrame{
             return;
         }
 
-        parentZones.definition();
+        new Thread(() -> parentZones.definition()).start();
+        stateChange = true;
+    }
+
+    private void rotation(){
+        if(!parentZones.isChoiseFragment()){
+            JOptionPane.showMessageDialog(MainView.this, "Zone B is empty!");
+            return;
+        }
+
+        final JDialog dialog = new JDialog();
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+
+        final JButton acceptButton = new JButton("Accept");
+        JTextField rotationField = new JTextField();
+        acceptButton.addActionListener(s -> {
+            String angleStr = rotationField.getText();
+            if(angleStr.isEmpty()){
+                return;
+            }
+            int angle = Integer.parseInt(angleStr);
+            if(angle < - 180 || angle > 180){
+                return;
+            }
+            new Thread(() -> parentZones.rotation(angle)).start();
+            dialog.dispose();
+        });
+
+        rotationField.setName("Angle");
+        //PlainDocument plainDocW = (PlainDocument) rotationField.getDocument();
+        //plainDocW.setDocumentFilter(new IntFilter());
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                new Thread(() -> parentZones.copyRight()).start();
+            }
+        });
+
+
+        mainPanel.add(rotationField);
+        mainPanel.add(acceptButton);
+
+        dialog.add(mainPanel);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setModal(true);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+        stateChange = true;
     }
 
 
@@ -743,16 +830,7 @@ public class MainView extends JFrame{
 
         @Override
         public void windowClosing(WindowEvent e) {
-            if(stateChange) {
-                int result = JOptionPane.showConfirmDialog(MainView.this,
-                        "Do you want to save filtered image?",
-                        "Exit",
-                        JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.YES_OPTION) {
-                    FileSaverListener fileSaverListener = new FileSaverListener(fileManager);
-                    fileSaverListener.saveState();
-                }
-            }
+            checkAndSave();
         }
 
         @Override
@@ -779,6 +857,39 @@ public class MainView extends JFrame{
         public void windowDeactivated(WindowEvent e) {
 
         }
+    }
+
+    private class IntFilter extends DocumentFilter {
+        private static final String mask = "[+-]?[0-9]+";
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches(mask)) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text.matches(mask)) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+    }
+
+    public boolean checkAndSave(){
+        if(stateChange) {
+            int result = JOptionPane.showConfirmDialog(MainView.this,
+                    "Do you want to save filtered image?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                FileSaverListener fileSaverListener = new FileSaverListener(fileManager);
+                fileSaverListener.saveState();
+                return true;
+            }
+        }
+        return false;
     }
 
     public ImageBmp getFinalImage() {

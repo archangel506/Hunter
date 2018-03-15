@@ -115,14 +115,14 @@ public class ParentZones extends JPanel {
     }
 
     public void sobel(int limit){
-        ImageBmp imageBmp = new DualSupportFilter().algroritm(zoneB.getImage(), limit);
-        zoneC.setImage(new SobelFilter().algroritm(imageBmp));
+        ImageBmp imageBmp = new SobelFilter().algroritm(zoneB.getImage());
+        zoneC.setImage(new DualSupportFilter().algroritm(imageBmp, limit));
         zoneC.repaint();
     }
 
     public void roberts(int limit){
-        ImageBmp imageBmp = new DualSupportFilter().algroritm(zoneB.getImage(), limit);
-        zoneC.setImage(new RobertsFilter().algroritm(imageBmp));
+        ImageBmp imageBmp = new RobertsFilter().algroritm(zoneB.getImage());
+        zoneC.setImage(new DualSupportFilter().algroritm(imageBmp, limit));
         zoneC.repaint();
     }
 
@@ -133,6 +133,11 @@ public class ParentZones extends JPanel {
 
     public void definition(){
         zoneC.setImage(new DefinitionFilter().algroritm(zoneB.getImage()));
+        zoneC.repaint();
+    }
+
+    public void rotation(int angle){
+        zoneC.setImage(new RotationFilter().algroritm(zoneB.getImage(), angle));
         zoneC.repaint();
     }
 
@@ -209,6 +214,7 @@ public class ParentZones extends JPanel {
             selectPartFrame(e.getX(), e.getY());
         }
 
+
         private void selectPartFrame(int x, int y){
             ImageBmp image = zoneA.getImage();
             if (zoneA.getImage() == null || !enableSelect) return;
@@ -236,13 +242,13 @@ public class ParentZones extends JPanel {
         }
 
         private void setPozitionSelect(int x, int y){
+            select.setPreferredSize(new Dimension(zoneA.getSizeSelect(), zoneA.getSizeSelect()));
+
             int leftBorderSelect = x - select.getWidth() / 2;
             int topBorderselect = y - select.getHeight() / 2;
 
             select.setVisible(true);
             select.setOpaque(false);
-            select.setBorder(BorderFactory.createDashedBorder(Color.BLUE.brighter(), 1, 20, 5, true));
-            select.setPreferredSize(new Dimension(zoneA.getSizeSelect(), zoneA.getSizeSelect()));
 
             if (leftBorderSelect < 0)
                 leftBorderSelect = 0;
@@ -252,7 +258,7 @@ public class ParentZones extends JPanel {
                 topBorderselect = 0;
             if (topBorderselect > 350 - zoneA.getSizeSelect())
                 topBorderselect = 350 - zoneA.getSizeSelect();
-
+            select.setBorder(new MyXorBorder(zoneA.getImage(), zoneA.getSizeSelect(), zoneA.getSizeSelect()));
             select.setLocation(leftBorderSelect, topBorderselect);
         }
     }

@@ -29,6 +29,7 @@ public class FileSaverAsListener implements ActionListener {
             JOptionPane.showMessageDialog(mainView,  "Zone C is empty!");
             return;
         }
+        jFileChooser.setCurrentDirectory(new File("FIT_15203_Sushko_Denis_Filter_Data/"));
         int ret = jFileChooser.showSaveDialog(mainView);
         if (ret == JFileChooser.APPROVE_OPTION) {
             File file = getCorrectFile();
@@ -42,9 +43,7 @@ public class FileSaverAsListener implements ActionListener {
         String fileName = file.getAbsolutePath();
         Path path = Paths.get(fileName);
 
-        if (!path.toString().endsWith(".bmp") || !path.toString().endsWith(".png")) {
-            file = new File(fileName + ".bmp");
-        }
+        if (!path.toString().endsWith(".bmp")) file = new File(fileName + ".bmp");
         return file;
     }
 }

@@ -16,8 +16,10 @@ public class NewStateListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         MainView mainView = fileManager.getMainView();
-        mainView.clearFrame();
-        mainView.setStateChange(false);
-        fileManager.setCurrentFilename(null);
+        if(mainView.checkAndSave()) {
+            mainView.clearFrame();
+            mainView.setStateChange(false);
+            fileManager.setCurrentFilename(null);
+        }
     }
 }

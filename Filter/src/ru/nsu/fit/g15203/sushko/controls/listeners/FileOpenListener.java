@@ -30,14 +30,15 @@ public class FileOpenListener implements ActionListener {
             File file = jFileChooser.getSelectedFile();
             try {
                 File temp;
-                if (file.toString().endsWith(".png")) {
+                boolean isBmp = file.toString().endsWith(".bmp");
+                if (!isBmp) {
                     temp = convertToBmp(file);
                 }
                 else {
                     temp = file;
                 }
                 fileManager.load(temp.getAbsolutePath());
-                temp.delete();
+                if(!isBmp) temp.delete();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(mainView,"Unsupported file");
             }

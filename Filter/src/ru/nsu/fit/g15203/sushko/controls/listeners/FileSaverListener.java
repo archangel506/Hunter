@@ -3,6 +3,7 @@ package ru.nsu.fit.g15203.sushko.controls.listeners;
 import ru.nsu.fit.g15203.sushko.models.FileManager;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 public class FileSaverListener extends FileSaverAsListener {
 
@@ -23,6 +24,7 @@ public class FileSaverListener extends FileSaverAsListener {
             } else{
                 fileManager.save(filename);
             }
+
         }
     }
 }
