@@ -2,12 +2,12 @@ package ru.nsu.fit.g15203.sushko;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.DecimalFormat;
 
 
 public final class Main {
     private final static String resPath = "src/ru/nsu/fit/g15203/sushko/res/icons/";
-    private final static String aboutDialog = "aboutDialog.jpg" +
-            "";
+    private final static String aboutDialog = "aboutDialog.jpg";
     private final static String aboutIcon = "about.gif";
     private final static String gridIcon = "grid.png";
     private final static String interpolationIcon = "interpolation.png";
@@ -18,15 +18,32 @@ public final class Main {
 
     private final JFrame mainFrame = new JFrame("Izoline");
     private final JPanel actionPanel = new JPanel();
+    private final JLabel statusBar = new JLabel("Status Bar");
+    private final DecimalFormat decimalFormat = new DecimalFormat();
+
 
     {
         mainFrame.setLayout(new BorderLayout());
         initMenu();
         initToolbar();
         mainFrame.setSize(new Dimension(800, 600));
+        mainFrame.setMinimumSize(new Dimension(800, 600));
         mainFrame.add(actionPanel, BorderLayout.CENTER);
+        mainFrame.add(statusBar, BorderLayout.SOUTH);
         mainFrame.setVisible(true);
     }
+
+    void setValueStatusBar(int x, int y, double value){
+        statusBar.setText
+                (
+                    "x: " + x + ", " +
+                    "y: " + y + ", " +
+                    "z: " + decimalFormat.format(value)
+                );
+    }
+
+
+
 
     private void initToolbar() {
         JToolBar toolBar = new JToolBar();
