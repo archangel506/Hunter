@@ -1,31 +1,26 @@
 package ru.nsu.fit.g15203.sushko;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class DrawerFunction {
+    public static final int NOT_CLICKED = -1;
     private static final int TWO_CROSSED_BORDERS = 2;
     private static final int THREE_CROSSED_BORDERS = 3;
     private static final int FOUR_CROSSED_BORDERS = 4;
-    private static final int NOT_CLICKED = -1;
     private final Color[] funcColors;
     private final Color izolineColor;
     private Function function;
     private Legend legend = new Legend();
-    @Getter @Setter private int countLevels;
-    @Getter @Setter private boolean isInterpolation = false;
-    @Getter @Setter private boolean haveGrid = false;
-    @Getter @Setter private boolean haveIzolines = false;
+    private int countLevels;
+    private boolean isInterpolation = false;
+    private boolean haveGrid = false;
+    private boolean haveIzolines = false;
+    private double mouseValue = NOT_CLICKED;
+    private double[] legendValues;
     private double[] criticalValues;
     private double[] points;
-    @Getter private double[] legendValues;
-    @Getter @Setter private double mouseValue = NOT_CLICKED;
-
 
     public DrawerFunction
             (
@@ -74,28 +69,32 @@ public class DrawerFunction {
     private void drawIzoline(final BufferedImage bufferedImage, final double criticalValue)
     {
 
-        val graphics = bufferedImage.getGraphics();
+        Graphics graphics = bufferedImage.getGraphics();
         graphics.setColor(izolineColor);
 
-        val imageWidth = bufferedImage.getWidth();
-        val imageHeight = bufferedImage.getHeight();
+        int imageWidth = bufferedImage.getWidth();
+        int imageHeight = bufferedImage.getHeight();
 
-        val gridWidth = function.getConfigField().getWidth() - 1;
-        val gridHeight = function.getConfigField().getHeight() - 1;
+        int gridWidth = function.getConfigField().getWidth() - 1;
+        int gridHeight = function.getConfigField().getHeight() - 1;
 
-        val deltaX = imageWidth / gridWidth;
-        val deltaY = imageHeight / gridHeight;
+        int deltaX = imageWidth / gridWidth;
+        int deltaY = imageHeight / gridHeight;
 
-        val isCrossedBorder = new boolean[4];
-        val crossingPoints = new int[4];
+        boolean[] isCrossedBorder = new boolean[4];
+        int[] crossingPoints = new int[4];
 
-        for (int y = 0; y < imageHeight; y += deltaY) {
-            if (imageHeight - y < deltaY) {
+        for (int y = 0; y < imageHeight; y += deltaY)
+        {
+            if (imageHeight - y < deltaY)
+            {
                 break;
             }
 
-            for (int x = 0; x < imageWidth; x += deltaX) {
-                if (imageWidth - x < deltaX) {
+            for (int x = 0; x < imageWidth; x += deltaX)
+            {
+                if (imageWidth - x < deltaX)
+                {
                     break;
                 }
 
@@ -128,27 +127,27 @@ public class DrawerFunction {
              final int y
             )
     {
-        val imageWidth = bufferedImage.getWidth();
-        val imageHeight = bufferedImage.getHeight();
+        final int imageWidth = bufferedImage.getWidth();
+        final int imageHeight = bufferedImage.getHeight();
 
-        val configField = function.getConfigField();
+        ConfigField configField = function.getConfigField();
 
-        val gridWidth = configField.getWidth() - 1;
-        val gridHeight = configField.getHeight() - 1;
+        final int gridWidth = configField.getWidth() - 1;
+        final int gridHeight = configField.getHeight() - 1;
 
-        val deltaX = imageWidth / gridWidth;
-        val deltaY = imageHeight / gridHeight;
+        final int deltaX = imageWidth / gridWidth;
+        final int deltaY = imageHeight / gridHeight;
 
-        val domainX = (configField.getB() - configField.getA()) / (imageWidth);
-        val domainY = (configField.getD() - configField.getC()) / (imageHeight);
+        final double domainX = (configField.getB() - configField.getA()) / (imageWidth);
+        final double domainY = (configField.getD() - configField.getC()) / (imageHeight);
 
         Arrays.fill(isCrossedBorder, true);
         Arrays.fill(crossPoints, -1);
 
-        val valueTopLeft = function.f(x * domainX, y * domainY);
-        val  valueTopRight = function.f((x + deltaX) * domainX, y * domainY);
-        val valueDownLeft = function.f(x * domainX, (y + deltaY) * domainY);
-        val valueDownRight = function.f((x + deltaX) * domainX, (y + deltaY) * domainY);
+        final double valueTopLeft = function.f(x * domainX, y * domainY);
+        final double valueTopRight = function.f((x + deltaX) * domainX, y * domainY);
+        final double valueDownLeft = function.f(x * domainX, (y + deltaY) * domainY);
+        final double valueDownRight = function.f((x + deltaX) * domainX, (y + deltaY) * domainY);
 
 
         if ((criticalValue < valueTopLeft && criticalValue < valueTopRight) || (criticalValue > valueTopLeft && criticalValue > valueTopRight))
@@ -156,8 +155,8 @@ public class DrawerFunction {
             isCrossedBorder[0] = false;
         } else
         {
-            val temp1 = criticalValue - valueTopLeft;
-            val temp2 = valueTopRight - valueTopLeft;
+            final double temp1 = criticalValue - valueTopLeft;
+            final double temp2 = valueTopRight - valueTopLeft;
 
             crossPoints[0] = (int) (x + deltaX * temp1 / temp2);
         }
@@ -167,8 +166,8 @@ public class DrawerFunction {
             isCrossedBorder[1] = false;
         } else
         {
-            val domain1 = criticalValue - valueDownLeft;
-            val domain2 = valueDownRight - valueDownLeft;
+            final double domain1 = criticalValue - valueDownLeft;
+            final double domain2 = valueDownRight - valueDownLeft;
 
             crossPoints[1] = (int) (x + deltaX * domain1 / domain2);
         }
@@ -178,8 +177,8 @@ public class DrawerFunction {
             isCrossedBorder[2] = false;
         } else
         {
-            val domain1 = criticalValue - valueDownLeft;
-            val domain2 = valueTopLeft - valueDownLeft;
+            final double domain1 = criticalValue - valueDownLeft;
+            final double domain2 = valueTopLeft - valueDownLeft;
 
             crossPoints[2] = (int) (y + deltaY - deltaY * domain1 / domain2);
         }
@@ -189,15 +188,15 @@ public class DrawerFunction {
             isCrossedBorder[3] = false;
         } else
         {
-            val domain1 = criticalValue - valueDownRight;
-            val domain2 = valueTopRight - valueDownRight;
+            final double domain1 = criticalValue - valueDownRight;
+            final double domain2 = valueTopRight - valueDownRight;
 
             crossPoints[3] = (int) (y + deltaY - deltaY * domain1 / domain2);
         }
 
         int count = 0;
 
-        for (val value : isCrossedBorder)
+        for (final boolean value : isCrossedBorder)
         {
             if (value) ++count;
         }
@@ -216,7 +215,7 @@ public class DrawerFunction {
                     final double criticalValue
             )
     {
-        boolean isCenterBigger = (function.f(x + deltaX / 2, y + deltaY / 2) > criticalValue);
+        final boolean isCenterBigger = (function.f(x + deltaX / 2, y + deltaY / 2) > criticalValue);
 
         if (isCenterBigger)
         {
@@ -243,7 +242,7 @@ public class DrawerFunction {
                     final double criticalValue
             )
     {
-        val graphics = bufferedImage.getGraphics();
+        final Graphics graphics = bufferedImage.getGraphics();
 
         for (int c = 0; c < 4; c++)
         {
@@ -251,13 +250,13 @@ public class DrawerFunction {
         }
 
 
-        val epsBorder = new boolean[4];
-        val epsPoints = new int[4];
-        val eps = 0.002;
+        final boolean[] epsBorder = new boolean[4];
+        final int[] epsPoints = new int[4];
+        final double eps = 0.002;
 
         countCrossedBorders(bufferedImage, epsBorder, epsPoints, criticalValue - eps, x, y);
 
-        val points = new Point[3];
+        final Point[] points = new Point[3];
 
         int index = 0;
 
@@ -337,7 +336,7 @@ public class DrawerFunction {
                     final int height
             )
     {
-        val points = new Point[2];
+        final Point[] points = new Point[2];
         int index = 0;
 
         if (isCrossedBorder[0])
@@ -370,16 +369,16 @@ public class DrawerFunction {
             points[index].y = crossPoints[3];
         }
 
-        for (int i = 0; i < points.length; ++i)
+        for (Point point: points)
         {
-            if (points[i].x >= width)
+            if (point.x >= width)
             {
-                points[i].x = width - 1;
+                point.x = width - 1;
             }
 
-            if (points[i].y >= height)
+            if (point.y >= height)
             {
-                points[i].y = height - 1;
+                point.y = height - 1;
             }
         }
         graphics.drawLine(points[0].x, points[0].y, points[1].x, points[1].y);
@@ -397,14 +396,14 @@ public class DrawerFunction {
         Graphics graphics = bufferedImage.getGraphics();
         graphics.setColor(Color.BLACK);
 
-        val imageWidth = bufferedImage.getWidth();
-        val imageHeight = bufferedImage.getHeight();
+        final int imageWidth = bufferedImage.getWidth();
+        final int imageHeight = bufferedImage.getHeight();
 
-        val gridWidth = function.getConfigField().getWidth() - 1;
-        val gridHeight = function.getConfigField().getHeight() - 1;
+        final int gridWidth = function.getConfigField().getWidth() - 1;
+        final int gridHeight = function.getConfigField().getHeight() - 1;
 
-        val shiftX = imageWidth / gridWidth;
-        val shiftY = imageHeight / gridHeight;
+        final int shiftX = imageWidth / gridWidth;
+        final int shiftY = imageHeight / gridHeight;
 
         for (int i = 0; i < imageWidth; i += shiftX)
         {
@@ -431,8 +430,8 @@ public class DrawerFunction {
 
     private void drawImage(final BufferedImage bufferedImage, final Function function)
     {
-        val width = bufferedImage.getWidth();
-        val height = bufferedImage.getHeight();
+        final int width = bufferedImage.getWidth();
+        final int height = bufferedImage.getHeight();
         points = calculateValuePoints(width, height, function);
         calculateCriticalValues(function);
         drawField(bufferedImage);
@@ -451,8 +450,8 @@ public class DrawerFunction {
     }
 
     private void drawFieldWithInterpolation(final BufferedImage bufferedImage){
-        val width = bufferedImage.getWidth();
-        val height = bufferedImage.getHeight();
+        final int width = bufferedImage.getWidth();
+        final int height = bufferedImage.getHeight();
         for (int y = 1; y < height - 1; y++)
         {
             for (int x = 1; x < width - 1; x++)
@@ -465,15 +464,15 @@ public class DrawerFunction {
 
 
     private void drawFieldWithoutInterpolation(final BufferedImage bufferedImage){
-        val width = bufferedImage.getWidth();
-        val height = bufferedImage.getHeight();
-        for (int x = 0; x < height; ++x)
+        final int width = bufferedImage.getWidth();
+        final int height = bufferedImage.getHeight();
+        for (int y = 0; y < height; ++y)
         {
-            for (int y = 0; y < width; ++y)
+            for (int x = 0; x < width; ++x)
             {
-                if (points[x * width + y] > criticalValues[criticalValues.length - 1])
+                if (points[y * width + x] > criticalValues[criticalValues.length - 1])
                 {
-                    bufferedImage.setRGB(y, x, funcColors[criticalValues.length - 2].getRGB());
+                    bufferedImage.setRGB(x, y, funcColors[criticalValues.length - 2].getRGB());
                 } else
                 {
                     findValue(bufferedImage, x, y, width);
@@ -484,11 +483,12 @@ public class DrawerFunction {
 
     private int interpolate(final double value)
     {
-        val index = findIndexForValues(value);
+        final int index = findIndexForValues(value);
         return calculatePixValue(index, value);
     }
 
-    private int findIndexForValues(final double value){
+    private int findIndexForValues(final double value)
+    {
         for (int i = 1; i < criticalValues.length; i++)
         {
             if (value < criticalValues[i])
@@ -501,22 +501,22 @@ public class DrawerFunction {
 
     private int calculatePixValue(final int indexCritical, final double value)
     {
-        val colorPrev = (indexCritical != 0)
+        final int colorPrev = (indexCritical != 0)
                 ? (funcColors[indexCritical - 1].getRGB())
                 : (funcColors[funcColors.length - 1].getRGB());
-        val colorNext = (indexCritical != criticalValues.length - 1)
+        final int colorNext = (indexCritical != criticalValues.length - 1)
                 ? (funcColors[indexCritical].getRGB())
                 : (funcColors[indexCritical - 1].getRGB());
 
-        val valuePrev = (indexCritical != 0)
+        final double valuePrev = (indexCritical != 0)
                 ? (criticalValues[indexCritical - 1])
                 : (criticalValues[criticalValues.length - 1]);
-        val valueNext = criticalValues[indexCritical];
+        final double valueNext = criticalValues[indexCritical];
 
         int pixValue = 0;
         for (int i = 0; i < 3; i++)
         {
-            val colorComponent = (((colorPrev >> i * 8) & 0xFF) * (valueNext - value) / (valueNext - valuePrev) +
+            double  colorComponent = (((colorPrev >> i * 8) & 0xFF) * (valueNext - value) / (valueNext - valuePrev) +
                     ((colorNext >> i * 8) & 0xFF) * (value - valuePrev) / (valueNext - valuePrev));
             pixValue |= ((int) colorComponent << i * 8);
         }
@@ -527,15 +527,18 @@ public class DrawerFunction {
 
     private double[] calculateValuePoints(final int width, final int height, final Function function)
     {
-        val configField = function.getConfigField();
-        val points = new double[width * height];
+        final ConfigField configField = function.getConfigField();
+        final double[] points = new double[width * height];
 
-        val domainX = (configField.getB() - configField.getA()) / width;
-        val domainY = (configField.getD() - configField.getC()) / height;
+        final double domainX = (configField.getB() - configField.getA()) / width;
+        final double domainY = (configField.getD() - configField.getC()) / height;
 
-        for (int x = 0; x < height; ++x) {
-            for (int y = 0; y < width; ++y) {
-                points[x * width + y] = function.f(x * domainX, y * domainY);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                points[y * width + x] = function.f(x * domainX, y * domainY);
             }
         }
 
@@ -544,11 +547,12 @@ public class DrawerFunction {
 
     private void calculateCriticalValues(final Function function)
     {
-        val configField = function.getConfigField();
-        criticalValues = new double[countLevels];
+        final ConfigField configField = function.getConfigField();
+        criticalValues = new double[countLevels + 1];
 
-        val offset = (configField.getMax() - configField.getMin()) / countLevels;
-        for (int i = 0; i < countLevels; i++) {
+        final double offset = (configField.getMax() - configField.getMin()) / countLevels;
+        for (int i = 0; i < countLevels + 1; ++i)
+        {
             criticalValues[i] = configField.getMin() + i * offset;
         }
     }
@@ -557,13 +561,49 @@ public class DrawerFunction {
     {
         for (int i = 1; i < criticalValues.length; i++)
         {
-            if (points[x * width + y] < criticalValues[i])
+            if (points[y * width + x] < criticalValues[i])
             {
-                bufferedImage.setRGB(y, x, funcColors[i - 1].getRGB());
+                bufferedImage.setRGB(x, y, funcColors[i - 1].getRGB());
                 break;
             }
         }
     }
 
+
+    public boolean isInterpolation() {
+        return isInterpolation;
+    }
+
+    public void setInterpolation(boolean interpolation) {
+        isInterpolation = interpolation;
+    }
+
+    public boolean isHaveGrid() {
+        return haveGrid;
+    }
+
+    public void setHaveGrid(boolean haveGrid) {
+        this.haveGrid = haveGrid;
+    }
+
+    public boolean isHaveIzolines() {
+        return haveIzolines;
+    }
+
+    public void setHaveIzolines(boolean haveIzolines) {
+        this.haveIzolines = haveIzolines;
+    }
+
+    public double getMouseValue() {
+        return mouseValue;
+    }
+
+    public void setMouseValue(double mouseValue) {
+        this.mouseValue = mouseValue;
+    }
+
+    public double[] getLegendValues() {
+        return legendValues;
+    }
 
 }

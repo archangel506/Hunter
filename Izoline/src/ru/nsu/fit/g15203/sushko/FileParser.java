@@ -1,24 +1,22 @@
 package ru.nsu.fit.g15203.sushko;
 
-import lombok.Getter;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.Scanner;
 
 public final class FileParser {
-    private static final String PATH_SETTINGS = "FIT_15203_Sushko_Denis_izoline_Data";
-    private static final int A = 20;
+    private static final String PATH_SETTINGS = "FIT_15203_Sushko_Denis_izoline_Data/";
+    private static final int A = 10;
     private static final int B = 0;
-    private static final int C = 20;
+    private static final int C = 10;
     private static final int D = 0;
     private final JFrame field;
     private final JFileChooser fileChooser = new JFileChooser();
-    @Getter private Color[] funcColors;
-    @Getter private Color izolineColor;
-    @Getter private ConfigField configField;
-    @Getter private int countLevels;
+    private Color[] funcColors;
+    private Color izolineColor;
+    private ConfigField configField;
+    private int countLevels;
 
     {
         fileChooser.setCurrentDirectory(new File(PATH_SETTINGS));
@@ -47,7 +45,6 @@ public final class FileParser {
         configField.setB(B);
         configField.setC(C);
         configField.setD(D);
-        //legendFunction = new LegendFunction();
     }
 
     private void readFile(final File file) throws FileNotFoundException{
@@ -72,6 +69,23 @@ public final class FileParser {
             return fileChooser.getSelectedFile();
         }
         return null;
+    }
+
+
+    public Color[] getFuncColors() {
+        return funcColors;
+    }
+
+    public Color getIzolineColor() {
+        return izolineColor;
+    }
+
+    public ConfigField getConfigField() {
+        return configField;
+    }
+
+    public int getCountLevels() {
+        return countLevels;
     }
 
 }

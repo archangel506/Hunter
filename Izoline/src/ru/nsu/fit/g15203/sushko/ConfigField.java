@@ -1,29 +1,82 @@
 package ru.nsu.fit.g15203.sushko;
-
-import lombok.Getter;
-import lombok.Setter;
-
 public final class ConfigField {
-    @Getter @Setter private double max;
-    @Getter @Setter private double min;
+    private double max;
+    private double min;
 
-    @Getter @Setter private double a;
-    @Getter @Setter private double b;
-    @Getter @Setter private double c;
-    @Getter @Setter private double d;
+    private double a;
+    private double b;
+    private double c;
+    private double d;
 
-    @Getter @Setter private int width;
-    @Getter @Setter private int height;
+    private int width;
+    private int height;
 
-    public ConfigField(int width, int height, double a, double b, double c, double d){
-        this.width = width;
-        this.height = height;
+    public ConfigField(){}
+
+
+    public double getMax() {
+        return max;
+    }
+
+    public void setMax(double max) {
+        this.max = max;
+    }
+
+    public double getMin() {
+        return min;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
+    public double getA() {
+        return a;
+    }
+
+    public void setA(double a) {
         this.a = a;
+    }
+
+    public double getB() {
+        return b;
+    }
+
+    public void setB(double b) {
         this.b = b;
+    }
+
+    public double getC() {
+        return c;
+    }
+
+    public void setC(double c) {
         this.c = c;
+    }
+
+    public double getD() {
+        return d;
+    }
+
+    public void setD(double d) {
         this.d = d;
     }
 
-    public ConfigField(){}
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
 
 }
