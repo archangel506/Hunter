@@ -1,2 +1,0 @@
-﻿Алгоритм брезенхема в единственном методе drawline класса BresDrawLine в пакете hex.bresenhem
-Алгоритм спан заливки в единственном методе fillHex класса FillerSpan в пакете hex.span
