@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Hunter</string>
+    <string name="surname_name">Фамилия, имя, отчество</string>
+    <string name="mobile">Мобильный телефон</string>
+    <string name="email">Электронная почта</string>
+    <string name="city_residence">Город проживания</string>
+    <string name="company">Компания</string>
+    <string name="position">Должность</string>
+    <string name="area_activity">Твоя сфера деятельности</string>
+    <string name="preferred_technologies">Предпочитаемые технологии</string>
+    <string name="another_technologies">Другие технологии</string>
+    <string name="interesting_events">Выбери мероприятия, которые тебе интересны</string>
+    <string name="liked_report">Понравившийся доклад</string>
+    <string name="suggestions_and_сomments">Предложения и замечания</string>
+    <string name="ready_be_speaker">Я готов выступать спикером</string>
+    <string name="send_form">Отправить анкету</string>
+    <string name="form_settings">Настройки</string>
+    <string name="load_events">Загрузить мероприятия</string>
+</resources>

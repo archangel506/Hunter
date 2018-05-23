@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/form_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?android:attr/actionBarSize">
+
+    </android.support.v7.widget.Toolbar>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:context="ru.nsk.dsushko.hunter.presentation.views.FormActivity">
+
+            <EditText
+                android:id="@+id/name_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/surname_name" />
+
+            <EditText
+                android:id="@+id/mobile_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/mobile"
+                android:inputType="phone" />
+
+            <EditText
+                android:id="@+id/email_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/city_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/city_residence" />
+
+            <EditText
+                android:id="@+id/company_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/company" />
+
+            <EditText
+                android:id="@+id/position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/position" />
+
+            <Spinner
+                android:id="@+id/area_activity_candidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/area_activity" />
+
+            <Spinner
+                android:id="@+id/preferred_technologies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/another_technologies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/another_technologies" />
+
+            <Spinner
+                android:id="@+id/interesting_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/interesting_events" />
+
+            <EditText
+                android:id="@+id/liked_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/liked_report" />
+
+            <EditText
+                android:id="@+id/suggestions_and_сomments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/suggestions_and_сomments" />
+
+            <CheckBox
+                android:id="@+id/check_speaker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ready_be_speaker" />
+
+            <Button
+                android:id="@+id/send_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/send_form" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
