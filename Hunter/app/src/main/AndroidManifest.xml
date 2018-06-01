@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ru.nsk.dsushko.hunter">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:allowBackup="true"
+
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".presentation.views.FormActivity">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <activity android:name=".presentation.views.StandartFormActivity" />
+        <activity android:name=".presentation.views.LoadEventActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.views.LoadEventsActivity" />
-        <activity android:name=".presentation.views.ChooseEventsActivity" />
-    </application>
+        <activity android:name=".presentation.views.ChooseEventActivity" />
+        <activity android:name=".presentation.views.StudentFormActivity" />
+
+        <service android:name=".presentation.services.LoaderEventsService" />
+        <service android:name=".presentation.services.LoaderActualEventsService" />
+        <service android:name=".presentation.services.GetterCountResendAnketsService" />
+        <service android:name=".presentation.services.ResenderAnketsService" />
+        <service android:name=".presentation.services.LoaderTechnologyService" />
+        <service android:name=".presentation.services.LoaderWorkFieldsService" />
+    </application
+        >
 
 </manifest>

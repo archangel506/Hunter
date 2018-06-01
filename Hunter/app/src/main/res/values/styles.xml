@@ -1,11 +1,34 @@
 <resources>
-
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="card_event">
+        <item name="android:layout_margin">@dimen/margin_card_event</item>
+
+    </style>
+
+    <style name="text_navigation_events">
+        <item name="android:layout_margin">@dimen/margin_card_event</item>
+    </style>
+
+    <style name="title_navigation_events_text" parent="text_navigation_events">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/textsize_title_event</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="city_navigation_events_text" parent="text_navigation_events">
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">@dimen/textsize_city_event</item>
     </style>
 
 </resources>

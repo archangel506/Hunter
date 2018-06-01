@@ -1,8 +1,5 @@
 package ru.nsk.dsushko.hunter.domain.models
 
-import ru.nsk.dsushko.hunter.presentation.models.CityPresent
-import ru.nsk.dsushko.hunter.presentation.models.DatePresent
-
 data class Event(
         var id: Int?,
         var title: String?,

@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Hunter</string>
     <string name="surname_name">Фамилия, имя, отчество</string>
-    <string name="mobile">Мобильный телефон</string>
     <string name="email">Электронная почта</string>
     <string name="city_residence">Город проживания</string>
     <string name="company">Компания</string>
@@ -16,4 +15,17 @@
     <string name="send_form">Отправить анкету</string>
     <string name="form_settings">Настройки</string>
     <string name="load_events">Загрузить мероприятия</string>
+    <string name="choose_event">Выбрать мероприятие</string>
+    <string name="update_events">Обновить список мероприятий</string>
+    <string name="resend_ankets">Не отправлено %1$d анкет. Нажмите чтобы отправить</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="subscribe_news">Подписаться на новости</string>
+    <string name="school">Вуз</string>
+    <string name="faculty">Факультет</string>
+    <string name="speciality">Специальность</string>
+    <string name="graduate_year">Год выпуска</string>
+    <string name="comment">Комментарий</string>
+    <string name="agree_personal_data">Я согласен на обработку персональных данных</string>
+    <string name="need_agree">Вы не согласны с обработкой персональных данных</string>
+    <string name="success_send">Ваша анкета отправленна!</string>
 </resources>

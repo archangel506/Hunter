@@ -9,9 +9,8 @@
         android:id="@+id/form_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?android:attr/actionBarSize">
-
-    </android.support.v7.widget.Toolbar>
+        android:background="@color/colorPrimary"
+        android:minHeight="?android:attr/actionBarSize"/>
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -21,19 +20,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:context="ru.nsk.dsushko.hunter.presentation.views.FormActivity">
+            tools:context="ru.nsk.dsushko.hunter.presentation.views.StandartFormActivity">
 
             <EditText
-                android:id="@+id/name_candidate"
+                android:id="@+id/name_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/surname_name" />
+                android:hint="@string/surname_name"
+                android:inputType="text" />
 
             <EditText
-                android:id="@+id/mobile_candidate"
+                android:id="@+id/phone_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/mobile"
+                android:hint="@string/phone_number"
                 android:inputType="phone" />
 
             <EditText
@@ -44,7 +44,7 @@
                 android:inputType="textEmailAddress" />
 
             <EditText
-                android:id="@+id/city_candidate"
+                android:id="@+id/city_residence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/city_residence" />
@@ -53,22 +53,30 @@
                 android:id="@+id/company_candidate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/company" />
+                android:hint="@string/company"
+                android:inputType="text"/>
 
             <EditText
                 android:id="@+id/position"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/position" />
+                android:hint="@string/position"
+                android:inputType="text"/>
 
-            <Spinner
-                android:id="@+id/area_activity_candidate"
+            <EditText
+                android:id="@+id/liked_report"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/area_activity" />
+                android:hint="@string/liked_report"
+                android:inputType="text"/>
 
             <Spinner
-                android:id="@+id/preferred_technologies"
+                android:id="@+id/interestingWorkfield"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.androidbuts.multispinnerfilter.MultiSpinner
+                android:id="@+id/technologies_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -76,31 +84,38 @@
                 android:id="@+id/another_technologies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/another_technologies" />
+                android:hint="@string/another_technologies"
+                android:inputType="text"/>
 
-            <Spinner
-                android:id="@+id/interesting_events"
+            <com.androidbuts.multispinnerfilter.MultiSpinner
+                android:id="@+id/interestingEvents"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/interesting_events" />
-
-            <EditText
-                android:id="@+id/liked_report"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/liked_report" />
+                android:layout_height="wrap_content" />
 
             <EditText
                 android:id="@+id/suggestions_and_сomments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/suggestions_and_сomments" />
+                android:hint="@string/suggestions_and_сomments"
+                android:inputType="text"/>
+
+            <CheckBox
+                android:id="@+id/subscribe_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/subscribe_news" />
 
             <CheckBox
                 android:id="@+id/check_speaker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/ready_be_speaker" />
+
+            <CheckBox
+                android:id="@+id/agree_personal_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/agree_personal_data" />
 
             <Button
                 android:id="@+id/send_form"

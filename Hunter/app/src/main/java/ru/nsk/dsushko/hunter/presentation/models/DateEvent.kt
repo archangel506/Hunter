@@ -1,8 +1,9 @@
 package ru.nsk.dsushko.hunter.presentation.models
 
+import java.io.Serializable
 
 
-data class DatePresent(
+data class DateEvent(
     var start: String?,
     var end: String?
-)
+) : Serializable

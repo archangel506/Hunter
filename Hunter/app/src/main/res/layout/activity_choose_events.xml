@@ -7,38 +7,16 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/form_toolbar"
+        android:id="@+id/choose_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:minHeight="?android:attr/actionBarSize">
+        android:background="@color/colorPrimary"
+        android:minHeight="?android:attr/actionBarSize"/>
 
-    </android.support.v7.widget.Toolbar>
-
-    <RelativeLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_events"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/resend_forms_button"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:text="Не отправлено 0 сообщений. Нажмите чтобы отправить" />
-
-            <Spinner
-                android:id="@+id/spinner_events"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:entries="@array/entries"
-                android:spinnerMode="dialog" />
-        </LinearLayout>
-    </RelativeLayout>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
 

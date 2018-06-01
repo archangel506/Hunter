@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_event_in_recycler_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/card_event">
+
+    <LinearLayout
+        android:id="@+id/card_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title_event_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/title_navigation_events_text"/>
+
+        <TextView
+            android:id="@+id/city_event_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/city_navigation_events_text"/>
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>
