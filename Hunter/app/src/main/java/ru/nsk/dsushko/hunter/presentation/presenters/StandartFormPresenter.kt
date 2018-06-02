@@ -2,9 +2,9 @@ package ru.nsk.dsushko.hunter.presentation.presenters
 
 import android.app.Activity
 import android.os.Build
+import android.os.Bundle
 import android.text.Html
 import android.widget.*
-import com.androidbuts.multispinnerfilter.MultiSpinner
 import ru.nsk.dsushko.hunter.R
 import ru.nsk.dsushko.hunter.domain.Interrupter
 import ru.nsk.dsushko.hunter.presentation.models.*
@@ -22,9 +22,9 @@ class StandartFormPresenter(private val interrupter: Interrupter,
     private val position = activity.findViewById<EditText>(R.id.position)
     private val likedReport = activity.findViewById<EditText>(R.id.liked_report)
     private val interestingWorkFields = activity.findViewById<Spinner>(R.id.interestingWorkfield)
-    private val technologies = activity.findViewById<MultiSpinner>(R.id.technologies_spinner)
+    private val technologies = activity.findViewById<Button>(R.id.technologies_button)
     private val anotherTechnologies = activity.findViewById<EditText>(R.id.another_technologies)
-    private val interestingEvents = activity.findViewById<MultiSpinner>(R.id.interestingEvents)
+    private val interestingEvents = activity.findViewById<Button>(R.id.interesting_events_button)
     private val suggestion = activity.findViewById<EditText>(R.id.suggestions_and_сomments)
     private val subscribeNews = activity.findViewById<CheckBox>(R.id.subscribe_news)
     private val checkSpeaker = activity.findViewById<CheckBox>(R.id.check_speaker)
@@ -33,8 +33,21 @@ class StandartFormPresenter(private val interrupter: Interrupter,
     private lateinit var workFieldsInfo: List<WorkFieldsInfo>
     private lateinit var technologiesInfo: List<TechnologiesInfo>
     private lateinit var events: List<EventInfo>
-    private var selectedTech = BooleanArray(0)
-    private var selectedEvents = BooleanArray(0)
+    private lateinit var technologiesChooser : MultiChooser
+    private lateinit var eventsChooser : MultiChooser
+
+    private var savedSelectedEvents : BooleanArray? = null
+    private var savedSelectedTechnologies : BooleanArray? = null
+    private var positionWorkFields : Int? = null
+
+    init{
+        technologies.setOnClickListener({
+            technologiesChooser.chooseItems()
+        })
+        interestingEvents.setOnClickListener({
+            eventsChooser.chooseItems()
+        })
+    }
 
     override fun openSettings() =
         activity.startActivity(StandartFormActivity.createIntentToSettings(activity))
@@ -61,30 +74,48 @@ class StandartFormPresenter(private val interrupter: Interrupter,
         val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, titles.toTypedArray())
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         interestingWorkFields.adapter = adapter
-        interestingWorkFields.setSelection(0)
+        interestingWorkFields.setSelection(positionWorkFields ?: 0)
     }
 
     override fun updateTechnologies(technologiesInfo: List<TechnologiesInfo>) {
         this.technologiesInfo = technologiesInfo
-        initTechnologiesSpinner()
+        initTechnologiesChooser()
+        if(savedSelectedTechnologies != null){
+            technologiesChooser.selectedItems = savedSelectedTechnologies?.clone() ?: BooleanArray(technologiesInfo.size)
+        }
     }
 
     override fun updateEvents(events: List<EventInfo>) {
         this.events = events
-        initEventsSpinner()
+        initEventsChooser()
+        if(savedSelectedEvents != null){
+            eventsChooser.selectedItems = savedSelectedEvents?.clone() ?: BooleanArray(events.size)
+        }
+    }
+
+    fun saveState(outState: Bundle){
+        outState.putBooleanArray(KEY_EVENTS_CHOOSE, eventsChooser.selectedItems)
+        outState.putInt(KEY_WORK_FIELDS_CHOOSE, interestingWorkFields.selectedItemPosition)
+        outState.putBooleanArray(KEY_TECHNOLOGIES_CHOOSE, technologiesChooser.selectedItems)
+    }
+
+    fun loadState(savedInstanceState: Bundle){
+        savedSelectedEvents = savedInstanceState.getBooleanArray(KEY_EVENTS_CHOOSE)
+        positionWorkFields = savedInstanceState.getInt(KEY_WORK_FIELDS_CHOOSE)
+        savedSelectedTechnologies = savedInstanceState.getBooleanArray(KEY_TECHNOLOGIES_CHOOSE)
     }
 
     private fun packAnketa() : StandartAnketaInfo {
         val workFieldId = workFieldsInfo[interestingWorkFields.selectedItemPosition].id
         val techsId = mutableListOf<Int>()
-        for((index, chooseTech) in selectedTech.withIndex()){
+        for((index, chooseTech) in technologiesChooser.selectedItems.withIndex()){
             if(chooseTech){
                 techsId.add(technologiesInfo[index].id ?: 0)
             }
 
         }
         val eventsId = mutableListOf<Int>()
-        for((index, chooseTech) in selectedEvents.withIndex()){
+        for((index, chooseTech) in eventsChooser.selectedItems.withIndex()){
             if(chooseTech){
                 eventsId.add(events[index].id ?: 0)
             }
@@ -113,33 +144,54 @@ class StandartFormPresenter(private val interrupter: Interrupter,
 
     private fun clearForm(){
         interestingWorkFields.setSelection(0)
-        initTechnologiesSpinner()
-        initEventsSpinner()
+        positionWorkFields = null
+        savedSelectedEvents = null
+        savedSelectedTechnologies = null
+        initTechnologiesChooser()
+        initEventsChooser()
     }
 
-    private fun initTechnologiesSpinner(){
-        val map = LinkedHashMap<String, Boolean>()
-        for(technology in technologiesInfo){
-            map[technology.title ?: ""] = false
-        }
+    private fun initTechnologiesChooser(){
+        val titles = getTitlesTechnologies()
 
-        technologies.setItems(map,{ array -> selectedTech = array})
+        technologiesChooser = MultiChooser(activity,
+                activity.resources.getString(R.string.technologies_canditate), titles)
+    }
+
+
+    private fun initEventsChooser(){
+        val titles = getTitlesEvents()
+        eventsChooser = MultiChooser(activity,
+                activity.resources.getString(R.string.interesting_events), titles)
+
     }
 
     @Suppress("DEPRECATION")
-    private fun initEventsSpinner(){
-        val map = LinkedHashMap<String, Boolean>()
+    private fun getTitlesEvents() : Array<String?>{
+        val results = mutableListOf<String?>()
         for(event in events){
             val title =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                         Html.fromHtml(event.title ?: "", Html.FROM_HTML_MODE_LEGACY)
                     else
                         Html.fromHtml(event.title ?: "")
-
-            map[title.toString()] = false
+            results.add(title.toString())
         }
+        return results.toTypedArray()
+    }
 
-        interestingEvents.setItems(map, { array -> selectedEvents = array})
+    private fun getTitlesTechnologies() : Array<String?>{
+        val results = mutableListOf<String?>()
+        for(tech in technologiesInfo){
+            results.add(tech.title)
+        }
+        return results.toTypedArray()
+    }
+
+    private companion object {
+        private const val KEY_WORK_FIELDS_CHOOSE = "ru.nsk.dsushko.hunter.presentation.presenters.StandartFormPresenter.KEY_WORK_FIELDS"
+        private const val KEY_TECHNOLOGIES_CHOOSE = "ru.nsk.dsushko.hunter.presentation.presenters.StandartFormPresenter.KEY_TECHNOLOGIES"
+        private const val KEY_EVENTS_CHOOSE = "ru.nsk.dsushko.hunter.presentation.presenters.StandartFormPresenter.KEY_EVENTS"
     }
 
 }

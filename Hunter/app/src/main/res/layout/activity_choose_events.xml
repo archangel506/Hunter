@@ -4,14 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    style="@style/layout_style">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/choose_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:minHeight="?android:attr/actionBarSize"/>
+        style="@style/toolbar_style"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_events"

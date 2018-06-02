@@ -5,10 +5,10 @@
     <string name="city_residence">Город проживания</string>
     <string name="company">Компания</string>
     <string name="position">Должность</string>
-    <string name="area_activity">Твоя сфера деятельности</string>
+    <string name="your_work_fields">Твоя сфера деятельности</string>
     <string name="preferred_technologies">Предпочитаемые технологии</string>
     <string name="another_technologies">Другие технологии</string>
-    <string name="interesting_events">Выбери мероприятия, которые тебе интересны</string>
+    <string name="choose_interesting_events">Выбери мероприятия, которые тебе интересны</string>
     <string name="liked_report">Понравившийся доклад</string>
     <string name="suggestions_and_сomments">Предложения и замечания</string>
     <string name="ready_be_speaker">Я готов выступать спикером</string>
@@ -28,4 +28,7 @@
     <string name="agree_personal_data">Я согласен на обработку персональных данных</string>
     <string name="need_agree">Вы не согласны с обработкой персональных данных</string>
     <string name="success_send">Ваша анкета отправленна!</string>
+    <string name="close">Закрыть</string>
+    <string name="technologies_canditate">Технологии</string>
+    <string name="interesting_events">Интересные мероприятия</string>
 </resources>

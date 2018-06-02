@@ -8,11 +8,12 @@
 
     <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@drawable/cft_background</item>
     </style>
 
     <style name="card_event">
         <item name="android:layout_margin">@dimen/margin_card_event</item>
-
+        <item name="android:background">@color/colorPrimary</item>
     </style>
 
     <style name="text_navigation_events">
@@ -29,6 +30,25 @@
     <style name="city_navigation_events_text" parent="text_navigation_events">
         <item name="android:gravity">start</item>
         <item name="android:textSize">@dimen/textsize_city_event</item>
+    </style>
+
+    <style name="field_form_style">
+        <item name="android:layout_margin">@dimen/text_margin</item>
+    </style>
+
+    <style name="toolbar_style">
+        <item name="android:background">@color/colorToolbar</item>
+        <item name="android:minHeight">?android:attr/actionBarSize</item>
+    </style>
+
+    <style name="layout_style">
+        <item name="android:background">@drawable/cft_background</item>
+    </style>
+
+    <style name="button_style">
+        <item name="android:background">@color/colorButton</item>
+        <item name="android:layout_margin">@dimen/margin_button</item>
+        <item name="android:padding">@dimen/padding_text_in_buttons</item>
     </style>
 
 </resources>

@@ -1,56 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    style="@style/layout_style">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/load_events_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:minHeight="?android:attr/actionBarSize"/>
+        style="@style/toolbar_style"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <LinearLayout
+        <Button
+            android:id="@+id/resend_ankets_button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            style="@style/button_style"/>
 
-            <Button
-                android:id="@+id/resend_ankets_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
+        <Button
+            android:id="@+id/load_events_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/load_events"
+            style="@style/button_style"/>
 
-            <Button
-                android:id="@+id/load_events_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/load_events" />
+        <Button
+            android:id="@+id/moving_choose_events_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="@string/choose_event"
+            style="@style/button_style"/>
 
-            <Button
-                android:id="@+id/moving_choose_events_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/choose_event" />
+        <ProgressBar
+            android:id="@+id/load_events_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleInverse" />
+    </LinearLayout>
 
-            <ProgressBar
-                android:id="@+id/load_events_progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                style="?android:attr/progressBarStyleInverse" />
-
-        </LinearLayout>
-    </RelativeLayout>
-
-
-
-</RelativeLayout>
+</LinearLayout>

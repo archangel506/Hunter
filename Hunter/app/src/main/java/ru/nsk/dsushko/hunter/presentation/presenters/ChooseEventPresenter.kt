@@ -14,6 +14,6 @@ class ChooseEventPresenter(private val activity: Activity) {
     }
 
     private companion object {
-        const val STUDENT_TYPE_ANKETA = "student"
+        private const val STUDENT_TYPE_ANKETA = "student"
     }
 }

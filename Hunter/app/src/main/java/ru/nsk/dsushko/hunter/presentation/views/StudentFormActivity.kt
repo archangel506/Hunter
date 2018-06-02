@@ -16,7 +16,7 @@ import ru.nsk.dsushko.hunter.presentation.receivers.WorkFieldsBroadcastReceiver
 
 
 class StudentFormActivity : AppCompatActivity() {
-    private lateinit var presenter: FormPresenter
+    private lateinit var presenter: StudentFormPresenter
     private lateinit var broadcastWorkFields: WorkFieldsBroadcastReceiver
     private lateinit var broadcastTechnology: TechnologiesBroadcastReceiver
     private lateinit var events: List<EventInfo>
@@ -40,6 +40,20 @@ class StudentFormActivity : AppCompatActivity() {
 
         startService(StandartFormActivity.createIntentLoadTechologies(this))
         startService(StandartFormActivity.createIntentLoadWorkFields(this))
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if(savedInstanceState != null){
+            presenter.loadState(savedInstanceState)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        if(outState != null){
+            presenter.saveState(outState)
+        }
     }
 
     override fun onResume() {

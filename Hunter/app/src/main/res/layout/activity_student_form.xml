@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    style="@style/layout_style">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/form_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:minHeight="?android:attr/actionBarSize"/>
+        style="@style/toolbar_style"/>
 
     <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,89 +27,105 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/surname_name"
-                android:inputType="text" />
+                android:inputType="text"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/phone_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/phone_number"
-                android:inputType="phone" />
+                android:inputType="phone"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/email_candidate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/city_residence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/city_residence" />
+                android:hint="@string/city_residence"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/school_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/school"
-                android:inputType="text" />
+                android:inputType="text"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/faculty_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/faculty"
-                android:inputType="text" />
+                android:inputType="text"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/speciality_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/speciality"
-                android:inputType="text" />
+                android:inputType="text"
+                style="@style/field_form_style"/>
 
             <EditText
                 android:id="@+id/graduate_year_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/graduate_year"
-                android:inputType="text" />
+                android:inputType="number"
+                style="@style/field_form_style"/>
 
-            <com.androidbuts.multispinnerfilter.MultiSpinner
+            <Button
                 android:id="@+id/interestingWorkfield"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/your_work_fields"
+                style="@style/button_style"/>
 
-            <com.androidbuts.multispinnerfilter.MultiSpinner
-                android:id="@+id/interestingEvents"
+            <Button
+                android:id="@+id/interesting_events_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/interesting_events"
+                style="@style/button_style"/>
 
             <EditText
                 android:id="@+id/comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/comment" />
+                android:hint="@string/comment"
+                style="@style/field_form_style"/>
 
             <CheckBox
                 android:id="@+id/subscribe_news"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/subscribe_news" />
+                android:text="@string/subscribe_news"
+                style="@style/field_form_style"/>
 
             <CheckBox
                 android:id="@+id/agree_personal_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/agree_personal_data" />
+                android:text="@string/agree_personal_data"
+                style="@style/field_form_style"/>
 
             <Button
                 android:id="@+id/send_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/send_form" />
+                android:text="@string/send_form"
+                style="@style/button_style"/>
 
         </LinearLayout>
     </ScrollView>

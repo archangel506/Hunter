@@ -3,4 +3,8 @@
     <dimen name="textsize_title_event">20sp</dimen>
     <dimen name="textsize_city_event">18sp</dimen>
     <dimen name="margin_card_event">5dp</dimen>
+    <dimen name="margin_button">16dp</dimen>
+    <dimen name="text_margin">10dp</dimen>
+    <dimen name="padding_text_in_buttons">5dp</dimen>
+
 </resources>

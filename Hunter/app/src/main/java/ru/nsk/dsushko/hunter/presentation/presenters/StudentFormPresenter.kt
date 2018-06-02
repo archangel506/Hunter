@@ -1,10 +1,13 @@
 package ru.nsk.dsushko.hunter.presentation.presenters
 
 import android.app.Activity
+import android.os.Build
+import android.os.Bundle
+import android.text.Html
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
-import com.androidbuts.multispinnerfilter.MultiSpinner
 import ru.nsk.dsushko.hunter.R
 import ru.nsk.dsushko.hunter.domain.Interrupter
 import ru.nsk.dsushko.hunter.presentation.models.*
@@ -15,8 +18,8 @@ class StudentFormPresenter(private val interrupter: Interrupter,
                            private val positionSelectedEvent: Int,
                            private val activity: Activity) : FormPresenter {
 
-    private val interestingWorkFields = activity.findViewById<MultiSpinner>(R.id.interestingWorkfield)
-    private val interestingEvents = activity.findViewById<MultiSpinner>(R.id.interestingEvents)
+    private val interestingWorkFields = activity.findViewById<Button>(R.id.interestingWorkfield)
+    private val interestingEvents = activity.findViewById<Button>(R.id.interesting_events_button)
     private val name = activity.findViewById<EditText>(R.id.name_edittext)
     private val phone = activity.findViewById<EditText>(R.id.phone_edittext)
     private val email = activity.findViewById<EditText>(R.id.email_candidate)
@@ -29,11 +32,22 @@ class StudentFormPresenter(private val interrupter: Interrupter,
     private val subscribeNews = activity.findViewById<CheckBox>(R.id.subscribe_news)
     private val agree = activity.findViewById<CheckBox>(R.id.agree_personal_data)
 
+    private lateinit var workFieldsChooser : MultiChooser
+    private lateinit var eventsChooser : MultiChooser
     private lateinit var workFieldsInfo: List<WorkFieldsInfo>
     private lateinit var events: List<EventInfo>
-    private var selectedWorkFields = BooleanArray(0)
-    private var selectedEvents = BooleanArray(0)
 
+    private var savedSelectedEvents : BooleanArray? = null
+    private var savedSelectedWorkFields : BooleanArray? = null
+
+    init{
+        interestingWorkFields.setOnClickListener({
+            workFieldsChooser.chooseItems()
+        })
+        interestingEvents.setOnClickListener({
+            eventsChooser.chooseItems()
+        })
+    }
 
     override fun openSettings() =
             activity.startActivity(StandartFormActivity.createIntentToSettings(activity))
@@ -52,34 +66,49 @@ class StudentFormPresenter(private val interrupter: Interrupter,
                 .show()
     }
 
-    private fun clearForm() {
-        interestingWorkFields.setSelection(0)
-        initWorkFields()
-        initEvents()
-    }
-
     override fun updateWorkFields(workFieldsInfo: List<WorkFieldsInfo>) {
         this.workFieldsInfo = workFieldsInfo
         initWorkFields()
+        if(savedSelectedWorkFields != null){
+            workFieldsChooser.selectedItems = savedSelectedWorkFields?.clone() ?: BooleanArray(workFieldsInfo.size)
+        }
     }
 
     override fun updateTechnologies(technologiesInfo: List<TechnologiesInfo>) {}
 
     override fun updateEvents(events: List<EventInfo>) {
         this.events = events
-        initEvents()
+        initEventsChooser()
+        if(savedSelectedEvents != null){
+            eventsChooser.selectedItems = savedSelectedEvents?.clone() ?: BooleanArray(events.size)
+        }
+    }
+
+    fun saveState(outState: Bundle){
+        outState.putBooleanArray(KEY_EVENTS_CHOOSE, eventsChooser.selectedItems)
+        outState.putBooleanArray(KEY_WORK_FIELDS_CHOOSE, workFieldsChooser.selectedItems)
+    }
+
+    fun loadState(savedInstanceState: Bundle){
+        savedSelectedEvents = savedInstanceState.getBooleanArray(KEY_EVENTS_CHOOSE)
+        savedSelectedWorkFields = savedInstanceState.getBooleanArray(KEY_WORK_FIELDS_CHOOSE)
+    }
+
+    private fun clearForm() {
+        initWorkFields()
+        initEventsChooser()
     }
 
     private fun packAnketa(): StudentAnketaInfo {
         val workFieldsId = mutableListOf<Int>()
-        for ((index, chooseWorkField) in selectedWorkFields.withIndex()) {
+        for ((index, chooseWorkField) in workFieldsChooser.selectedItems.withIndex()) {
             if (chooseWorkField) {
                 workFieldsId.add(workFieldsInfo[index].id ?: 0)
             }
 
         }
         val eventsId = mutableListOf<Int>()
-        for ((index, chooseTech) in selectedEvents.withIndex()) {
+        for ((index, chooseTech) in eventsChooser.selectedItems.withIndex()) {
             if (chooseTech) {
                 eventsId.add(events[index].id ?: 0)
             }
@@ -105,20 +134,42 @@ class StudentFormPresenter(private val interrupter: Interrupter,
     }
 
     private fun initWorkFields() {
-        val map = LinkedHashMap<String, Boolean>()
-        for (workField in workFieldsInfo) {
-            map[workField.title ?: ""] = false
-        }
+        val titles = getTitlesWorkFields()
 
-        interestingWorkFields.setItems(map, { array -> selectedWorkFields = array })
+        workFieldsChooser = MultiChooser(activity,
+                activity.resources.getString(R.string.technologies_canditate), titles)
     }
 
-    private fun initEvents() {
-        val map = LinkedHashMap<String, Boolean>()
-        for (event in events) {
-            map[event.title ?: ""] = false
-        }
+    private fun initEventsChooser() {
+        val titles = getTitlesEvents()
+        eventsChooser = MultiChooser(activity,
+                activity.resources.getString(R.string.interesting_events), titles)
+    }
 
-        interestingEvents.setItems(map, { array -> selectedEvents = array })
+    @Suppress("DEPRECATION")
+    private fun getTitlesEvents() : Array<String?>{
+        val results = mutableListOf<String?>()
+        for(event in events){
+            val title =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        Html.fromHtml(event.title ?: "", Html.FROM_HTML_MODE_LEGACY)
+                    else
+                        Html.fromHtml(event.title ?: "")
+            results.add(title.toString())
+        }
+        return results.toTypedArray()
+    }
+
+    private fun getTitlesWorkFields() : Array<String?>{
+        val results = mutableListOf<String?>()
+        for(workField in workFieldsInfo){
+            results.add(workField.title)
+        }
+        return results.toTypedArray()
+    }
+
+    private companion object {
+        private const val KEY_WORK_FIELDS_CHOOSE = "ru.nsk.dsushko.hunter.presentation.presenters.StudentFormPresenter.KEY_WORK_FIELDS"
+        private const val KEY_EVENTS_CHOOSE = "ru.nsk.dsushko.hunter.presentation.presenters.StudentFormPresenter.KEY_EVENTS"
     }
 }

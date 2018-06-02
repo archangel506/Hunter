@@ -28,8 +28,6 @@ class LoadEventsPresenter(private val activity: Activity) {
                     count
             )
         }
-
-
     }
 
     fun loadEvents(){
@@ -72,6 +70,4 @@ class LoadEventsPresenter(private val activity: Activity) {
 
     fun openChooseEvents() =
             activity.startActivity(LoadEventActivity.createIntentToChooseEvents(activity, events))
-
-
 }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
@@ -20,7 +21,7 @@ import ru.nsk.dsushko.hunter.presentation.services.LoaderTechnologyService
 import ru.nsk.dsushko.hunter.presentation.services.LoaderWorkFieldsService
 
 class StandartFormActivity : AppCompatActivity() {
-    private lateinit var presenter: FormPresenter
+    private lateinit var presenter: StandartFormPresenter
     private lateinit var broadcastWorkFields: WorkFieldsBroadcastReceiver
     private lateinit var broadcastTechnology: TechnologiesBroadcastReceiver
     private lateinit var events: List<EventInfo>
@@ -37,15 +38,40 @@ class StandartFormActivity : AppCompatActivity() {
                 ChooseEventActivity.getPositionSelectedEvent(intent),
                 this
         )
-        findViewById<Button>(R.id.send_form).setOnClickListener{
+        findViewById<Button>(R.id.send_form).setOnClickListener {
             presenter.sendForm()
         }
+
         events = ChooseEventActivity.getEvents(intent)
         presenter.updateEvents(events)
-
         startService(createIntentLoadTechologies(this))
         startService(createIntentLoadWorkFields(this))
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.form_menu_toolbar, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item == null) {
+            return super.onOptionsItemSelected(item)
+        }
+
+        if (item.itemId == R.id.action_settings_form) {
+            presenter.openSettings()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if(savedInstanceState != null){
+            presenter.loadState(savedInstanceState)
+        }
     }
 
     override fun onResume() {
@@ -56,28 +82,19 @@ class StandartFormActivity : AppCompatActivity() {
         registerReceiver(broadcastWorkFields, createIntentFilterForWorkFields())
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        if(outState != null){
+            presenter.saveState(outState)
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         unregisterReceiver(broadcastTechnology)
         unregisterReceiver(broadcastWorkFields)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.form_menu_toolbar, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if(item == null) {
-            return super.onOptionsItemSelected(item)
-        }
-
-        if(item.itemId == R.id.action_settings_form){
-            presenter.openSettings()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
 
     companion object {
         private const val KEY_WORKFIELDS = "ru.nsk.dsushko.hunter.presentation.views.StandartFormActivity.KEY_WORKFIELDS"
@@ -85,36 +102,32 @@ class StandartFormActivity : AppCompatActivity() {
         private const val KEY_BROADCAST_TECHNOLOGIES = "ru.nsk.dsushko.hunter.presentation.views.StandartFormActivity.KEY_BROADCAST_TECHNOLOGIES"
         private const val KEY_BROADCAST_WORKFIELDS = "ru.nsk.dsushko.hunter.presentation.views.StandartFormActivity.KEY_BROADCAST_WORKFIELDS"
 
-        fun createIntentToSettings(context: Context) : Intent {
+        fun createIntentToSettings(context: Context): Intent {
             val intent = Intent(context, LoadEventActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             return intent
         }
 
-        fun createIntentLoadWorkFields(context: Context)
-            = Intent(context, LoaderWorkFieldsService::class.java)
+        fun createIntentLoadWorkFields(context: Context) = Intent(context, LoaderWorkFieldsService::class.java)
 
-        fun createIntentLoadTechologies(context: Context)
-                = Intent(context, LoaderTechnologyService::class.java)
+        fun createIntentLoadTechologies(context: Context) = Intent(context, LoaderTechnologyService::class.java)
 
-        fun createIntentToBroadcastTechnologies(technologiesInfo: List<TechnologiesInfo>): Intent{
+        fun createIntentToBroadcastTechnologies(technologiesInfo: List<TechnologiesInfo>): Intent {
             val intent = Intent(KEY_BROADCAST_TECHNOLOGIES)
             intent.putExtra(KEY_TECHNOLOGIES, BoxTechnologies(technologiesInfo))
             return intent
         }
 
-        fun createIntentToBroadcastWorkFields(workFieldsInfo: List<WorkFieldsInfo>) : Intent{
+        fun createIntentToBroadcastWorkFields(workFieldsInfo: List<WorkFieldsInfo>): Intent {
             val intent = Intent(KEY_BROADCAST_WORKFIELDS)
-             intent.putExtra(KEY_WORKFIELDS, BoxWorkFields(workFieldsInfo))
+            intent.putExtra(KEY_WORKFIELDS, BoxWorkFields(workFieldsInfo))
             return intent
         }
 
-        fun getTechnologies(intent: Intent)
-                = (intent.getSerializableExtra(KEY_TECHNOLOGIES) as BoxTechnologies)
+        fun getTechnologies(intent: Intent) = (intent.getSerializableExtra(KEY_TECHNOLOGIES) as BoxTechnologies)
                 .technologies
 
-        fun getWorkFields(intent: Intent)
-                = (intent.getSerializableExtra(KEY_WORKFIELDS) as BoxWorkFields)
+        fun getWorkFields(intent: Intent) = (intent.getSerializableExtra(KEY_WORKFIELDS) as BoxWorkFields)
                 .workFieldsInfo
 
         fun createIntentFilterForWorkFields() = IntentFilter(KEY_BROADCAST_WORKFIELDS)
