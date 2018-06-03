@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_clean_form"
+        android:title="@string/clean"
+        android:icon="@drawable/ic_clean"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_settings_form"
         android:title="@string/form_settings"
         android:icon="@drawable/ic_settings_black_24dp"

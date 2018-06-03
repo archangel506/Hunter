@@ -64,6 +64,10 @@ class StandartFormActivity : AppCompatActivity() {
             presenter.openSettings()
         }
 
+        if(item.itemId == R.id.action_clean_form){
+            presenter.clearForm()
+        }
+
         return super.onOptionsItemSelected(item)
     }
 

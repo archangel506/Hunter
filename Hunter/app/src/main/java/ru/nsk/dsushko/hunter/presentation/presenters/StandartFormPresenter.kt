@@ -105,6 +105,27 @@ class StandartFormPresenter(private val interrupter: Interrupter,
         savedSelectedTechnologies = savedInstanceState.getBooleanArray(KEY_TECHNOLOGIES_CHOOSE)
     }
 
+    fun clearForm(){
+        interestingWorkFields.setSelection(0)
+        positionWorkFields = null
+        savedSelectedEvents = null
+        savedSelectedTechnologies = null
+        initTechnologiesChooser()
+        initEventsChooser()
+        name.setText("")
+        phone.setText("")
+        email.setText("")
+        cityResidence.setText("")
+        companyCandidate.setText("")
+        position.setText("")
+        likedReport.setText("")
+        anotherTechnologies.setText("")
+        suggestion.setText("")
+        subscribeNews.isChecked = false
+        checkSpeaker.isChecked = false
+        agree.isChecked = false
+    }
+
     private fun packAnketa() : StandartAnketaInfo {
         val workFieldId = workFieldsInfo[interestingWorkFields.selectedItemPosition].id
         val techsId = mutableListOf<Int>()
@@ -140,15 +161,6 @@ class StandartFormPresenter(private val interrupter: Interrupter,
                 email.text.toString(),
                 agree.isChecked
         )
-    }
-
-    private fun clearForm(){
-        interestingWorkFields.setSelection(0)
-        positionWorkFields = null
-        savedSelectedEvents = null
-        savedSelectedTechnologies = null
-        initTechnologiesChooser()
-        initEventsChooser()
     }
 
     private fun initTechnologiesChooser(){

@@ -94,9 +94,22 @@ class StudentFormPresenter(private val interrupter: Interrupter,
         savedSelectedWorkFields = savedInstanceState.getBooleanArray(KEY_WORK_FIELDS_CHOOSE)
     }
 
-    private fun clearForm() {
+    fun clearForm() {
+        savedSelectedEvents = null
+        savedSelectedWorkFields = null
         initWorkFields()
         initEventsChooser()
+        name.setText("")
+        phone.setText("")
+        email.setText("")
+        city.setText("")
+        school.setText("")
+        faculty.setText("")
+        speciality.setText("")
+        graduate.setText("")
+        comment.setText("")
+        subscribeNews.isChecked = false
+        agree.isChecked = false
     }
 
     private fun packAnketa(): StudentAnketaInfo {
